@@ -1,0 +1,8 @@
+{
+  "status": "active",
+  "apiName": "Sample Name",
+  "version": "sample_version",
+  "timestamp": "2026-06-20T10:44:42.664Z",
+  "uptime": 10,
+  "salesforceConnectivityStatus": "active"
+}

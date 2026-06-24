@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+      xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+      xmlns:anypoint-mq="http://www.mulesoft.org/schema/mule/anypoint-mq"
+      xmlns:os="http://www.mulesoft.org/schema/mule/os"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/anypoint-mq http://www.mulesoft.org/schema/mule/anypoint-mq/current/mule-anypoint-mq.xsd http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+  <error-handler name="globalErrorHandler">
+    <on-error-propagate type="ANYPOINT-MQ:ACKING" doc:name="Handle ANYPOINT-MQ:ACKING">
+      <ee:transform doc:name="Build Error Response">
+        <ee:message>
+          <ee:set-payload resource="dw/anypoint-mq-acking-error.dwl" />
+        </ee:message>
+      </ee:transform>
+      <set-variable variableName="httpStatus" value="500" />
+    </on-error-propagate>
+    <on-error-propagate type="ANYPOINT-MQ:RETRY_EXHAUSTED" doc:name="Handle ANYPOINT-MQ:RETRY_EXHAUSTED">
+      <ee:transform doc:name="Build Error Response">
+        <ee:message>
+          <ee:set-payload resource="dw/anypoint-mq-retry-exhausted-error.dwl" />
+        </ee:message>
+      </ee:transform>
+      <set-variable variableName="httpStatus" value="500" />
+    </on-error-propagate>
+    <on-error-propagate type="OS:CONNECTIVITY" doc:name="Handle OS:CONNECTIVITY">
+      <ee:transform doc:name="Build Error Response">
+        <ee:message>
+          <ee:set-payload resource="dw/os-connectivity-error.dwl" />
+        </ee:message>
+      </ee:transform>
+      <set-variable variableName="httpStatus" value="503" />
+    </on-error-propagate>
+    <on-error-propagate type="HTTP:TIMEOUT" doc:name="Handle HTTP:TIMEOUT">
+      <ee:transform doc:name="Build Error Response">
+        <ee:message>
+          <ee:set-payload resource="dw/http-timeout-error.dwl" />
+        </ee:message>
+      </ee:transform>
+      <set-variable variableName="httpStatus" value="503" />
+    </on-error-propagate>
+    <on-error-propagate type="HTTP:CONNECTIVITY" doc:name="Handle HTTP:CONNECTIVITY">
+      <ee:transform doc:name="Build Error Response">
+        <ee:message>
+          <ee:set-payload resource="dw/http-connectivity-error.dwl" />
+        </ee:message>
+      </ee:transform>
+      <set-variable variableName="httpStatus" value="503" />
+    </on-error-propagate>
+    <on-error-propagate type="MULE:EXPRESSION" doc:name="Handle MULE:EXPRESSION">
+      <ee:transform doc:name="Build Error Response">
+        <ee:message>
+          <ee:set-payload resource="dw/mule-expression-error.dwl" />
+        </ee:message>
+      </ee:transform>
+      <set-variable variableName="httpStatus" value="500" />
+    </on-error-propagate>
+    <on-error-propagate type="MULE:CONNECTIVITY" doc:name="Handle MULE:CONNECTIVITY">
+      <ee:transform doc:name="Build Error Response">
+        <ee:message>
+          <ee:set-payload resource="dw/mule-connectivity-error.dwl" />
+        </ee:message>
+      </ee:transform>
+      <set-variable variableName="httpStatus" value="503" />
+    </on-error-propagate>
+    <on-error-propagate type="ANY" doc:name="Handle ANY">
+      <ee:transform doc:name="Build Error Response">
+        <ee:message>
+          <ee:set-payload resource="dw/any-error.dwl" />
+        </ee:message>
+      </ee:transform>
+      <set-variable variableName="httpStatus" value="500" />
+    </on-error-propagate>
+  </error-handler>
+
+</mule>

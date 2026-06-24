@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+      xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+
+  <flow name="post-salesforce-system-api-files-upload-flow" doc:id="doc-f2b265f3">
+    <logger level="INFO" message="#['post-salesforce-system-api-files-upload-flow | START | correlationId=' ++ correlationId]" category="com.mycompany.salesforce-system-api-sapi.post-salesforce-system-api-files-upload-flow" doc:name="Log Flow Start" />
+    <ee:transform doc:name="Extract Bearer Token and Set Correlation ID" doc:id="doc-7d0dfc5a">
+      <ee:variables doc:id="doc-3de0561f">
+        <ee:set-variable variableName="correlationId" doc:id="doc-60b068c2">
+          %dw 2.0
+output application/json
+---
+attributes.headers['x-correlation-id'] default uuid()
+        </ee:set-variable>
+        <ee:set-variable variableName="rawToken" doc:id="doc-fa81fe76">
+          %dw 2.0
+output application/json
+---
+((attributes.headers.authorization default '') replace 'Bearer ' with '') replace 'bearer ' with ''
+        </ee:set-variable>
+      </ee:variables>
+    </ee:transform>
+    <choice doc:name="Validate Bearer Token" doc:id="doc-a103ada0">
+      <when expression="#[vars.rawToken == null or vars.rawToken == '']" doc:id="doc-b7a259fe">
+        <flow-ref name="process-info-logger-sub-flow" doc:name="Call process-info-logger-sub-flow (Logger)" doc:id="doc-a5aljxnc" />
+        <raise-error type="APP:UNAUTHORIZED" description="invalid or missing Bearer Token" doc:id="doc-aa5563ed" />
+      </when>
+      <otherwise doc:id="doc-99e29fbb">
+        <flow-ref name="process-info-logger-sub-flow" doc:name="Call process-info-logger-sub-flow (Logger)" doc:id="doc-z90kerh3" />
+      </otherwise>
+    </choice>
+    <flow-ref name="process-info-logger-sub-flow" doc:name="Call process-info-logger-sub-flow (Logger)" doc:id="doc-kexd3a69" />
+    <ee:transform doc:name="Extract Request Fields per Contract" doc:id="doc-82c556bd">
+      <ee:message doc:id="doc-f5f3235f">
+        <ee:set-payload resource="dw/extract-request-fields-per-contract.dwl" />
+      </ee:message>
+      <ee:variables doc:id="doc-2f1b38b9">
+        <ee:set-variable variableName="batchId" doc:id="doc-6b125b4f">
+          %dw 2.0
+output application/json
+---
+payload.batchId default uuid()
+        </ee:set-variable>
+        <ee:set-variable variableName="incomingFiles" doc:id="doc-f655fe75">
+          %dw 2.0
+output application/json
+---
+payload.files default []
+        </ee:set-variable>
+        <ee:set-variable variableName="filesSent" doc:id="doc-3250b1b3">
+          %dw 2.0
+output application/json
+---
+sizeOf(payload.files default [])
+        </ee:set-variable>
+        <ee:set-variable variableName="filesUploaded" doc:id="doc-6ab16d03">
+          %dw 2.0
+output application/json
+---
+0
+        </ee:set-variable>
+        <ee:set-variable variableName="filesUpserted" doc:id="doc-45297177">
+          %dw 2.0
+output application/json
+---
+0
+        </ee:set-variable>
+        <ee:set-variable variableName="filesUploadedToKnowledge" doc:id="doc-e4d90f59">
+          %dw 2.0
+output application/json
+---
+0
+        </ee:set-variable>
+        <ee:set-variable variableName="uploadedFiles" doc:id="doc-bfaceea6">
+          %dw 2.0
+output application/json
+---
+{
+  correlationId: payload.correlationId as String,
+  batchId: payload.batchId as String,
+  filesSent: payload.filesSent as Number,
+  filesUploaded: payload.filesUploaded as Number,
+  filesUpserted: payload.filesUpserted as Number,
+  filesUploadedToKnowledge: payload.filesUploadedToKnowledge as Number,
+  uploadedFiles: payload.uploadedFiles,
+  upsertedFiles: payload.upsertedFiles,
+  failedFiles: payload.failedFiles,
+  processingTimestamp: payload.processingTimestamp as String,
+  errors: payload.errors
+}
+        </ee:set-variable>
+        <ee:set-variable variableName="upsertedFiles" doc:id="doc-9e593a91">
+          %dw 2.0
+output application/json
+---
+{
+  correlationId: payload.correlationId as String,
+  batchId: payload.batchId as String,
+  filesSent: payload.filesSent as Number,
+  filesUploaded: payload.filesUploaded as Number,
+  filesUpserted: payload.filesUpserted as Number,
+  filesUploadedToKnowledge: payload.filesUploadedToKnowledge as Number,
+  uploadedFiles: payload.uploadedFiles,
+  upsertedFiles: payload.upsertedFiles,
+  failedFiles: payload.failedFiles,
+  processingTimestamp: payload.processingTimestamp as String,
+  errors: payload.errors
+}
+        </ee:set-variable>
+        <ee:set-variable variableName="failedFiles" doc:id="doc-0acad6b7">
+          %dw 2.0
+output application/json
+---
+{
+  correlationId: payload.correlationId as String,
+  batchId: payload.batchId as String,
+  filesSent: payload.filesSent as Number,
+  filesUploaded: payload.filesUploaded as Number,
+  filesUpserted: payload.filesUpserted as Number,
+  filesUploadedToKnowledge: payload.filesUploadedToKnowledge as Number,
+  uploadedFiles: payload.uploadedFiles,
+  upsertedFiles: payload.upsertedFiles,
+  failedFiles: payload.failedFiles,
+  processingTimestamp: payload.processingTimestamp as String,
+  errors: payload.errors
+}
+        </ee:set-variable>
+        <ee:set-variable variableName="errors" doc:id="doc-3755a67e">
+          %dw 2.0
+output application/json
+---
+{
+  correlationId: payload.correlationId as String,
+  batchId: payload.batchId as String,
+  filesSent: payload.filesSent as Number,
+  filesUploaded: payload.filesUploaded as Number,
+  filesUpserted: payload.filesUpserted as Number,
+  filesUploadedToKnowledge: payload.filesUploadedToKnowledge as Number,
+  uploadedFiles: payload.uploadedFiles,
+  upsertedFiles: payload.upsertedFiles,
+  failedFiles: payload.failedFiles,
+  processingTimestamp: payload.processingTimestamp as String,
+  errors: payload.errors
+}
+        </ee:set-variable>
+      </ee:variables>
+    </ee:transform>
+    <flow-ref name="fetch-azure-keyvault-secret-sub-flow" doc:id="doc-75c1d364" />
+    <flow-ref name="get-salesforce-access-token-sub-flow" doc:id="doc-cec9aa5b" />
+    <foreach collection="#[vars.incomingFiles]" doc:name="Process Each File in Batch" doc:id="doc-b7ebe477">
+      <ee:transform doc:name="Set Current File Variable" doc:id="doc-251e7156">
+        <ee:variables doc:id="doc-b7b7b1d1">
+          <ee:set-variable variableName="currentFile" doc:id="doc-c0f04010">
+            %dw 2.0
+output application/json
+---
+payload
+          </ee:set-variable>
+        </ee:variables>
+      </ee:transform>
+      <flow-ref name="process-info-logger-sub-flow" doc:name="Call process-info-logger-sub-flow (Logger)" doc:id="doc-8gi96ayi" />
+      <flow-ref name="process-single-file-sub-flow" doc:id="doc-3b1077b4" />
+    </foreach>
+    <ee:transform doc:name="Build Upload Result Response per Contract" doc:id="doc-fc37e3b3">
+      <ee:message doc:id="doc-066dbbff">
+        <ee:set-payload resource="dw/build-upload-result-response-per-contract.dwl" />
+      </ee:message>
+      <ee:variables doc:id="doc-f977622b">
+        <ee:set-variable variableName="httpStatus" doc:id="doc-886d6446">
+          200
+        </ee:set-variable>
+        <ee:set-variable variableName="outboundHeaders" doc:id="doc-8cf735c0">
+          %dw 2.0
+output application/json
+---
+(vars.outboundHeaders default {}) ++ {'X-Correlation-Id': vars.correlationId default ''}
+        </ee:set-variable>
+      </ee:variables>
+    </ee:transform>
+    <flow-ref name="process-info-logger-sub-flow" doc:name="Call process-info-logger-sub-flow (Logger)" doc:id="doc-rguvizoj" />
+    <logger level="INFO" message="#['post-salesforce-system-api-files-upload-flow | END | correlationId=' ++ correlationId]" category="com.mycompany.salesforce-system-api-sapi.post-salesforce-system-api-files-upload-flow" doc:name="Log Flow End" />
+    <error-handler ref="globalErrorHandler" />
+  </flow>
+
+</mule>

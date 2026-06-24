@@ -1,0 +1,40 @@
+#%RAML 1.0 DataType
+type: object
+properties:
+  correlationId:
+    type: string
+  batchId:
+    type: string
+  filesSent:
+    type: number
+  filesUploaded:
+    type: number
+  filesUpserted:
+    type: number
+  filesUploadedToKnowledge:
+    type: number
+  uploadedFiles:
+    type: array
+    items:
+      type: object
+  upsertedFiles:
+    type: array
+    items:
+      type: object
+  failedFiles:
+    type: array
+    items:
+      type: object
+  processingTimestamp:
+    type: datetime
+  errors:
+    type: array
+    items:
+      type: object
+      properties:
+        fileName:
+          type: string
+        errorCode:
+          type: string
+        errorMessage:
+          type: string

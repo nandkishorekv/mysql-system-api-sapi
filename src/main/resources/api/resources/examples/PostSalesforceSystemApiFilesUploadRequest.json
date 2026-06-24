@@ -1,0 +1,15 @@
+{
+  "correlationId": "sample-id-123",
+  "batchId": "sample-id-123",
+  "files": [
+    {
+      "fileName": "Sample Name",
+      "fileContent": "sample_fileContent",
+      "mimeType": "sample_mimeType",
+      "serverRelativeUrl": "sample_serverRelativeUrl",
+      "lastModifiedDateTime": "2026-06-20T10:44:42.663Z",
+      "fileSize": 0,
+      "fileExtension": "sample_fileExtension"
+    }
+  ]
+}

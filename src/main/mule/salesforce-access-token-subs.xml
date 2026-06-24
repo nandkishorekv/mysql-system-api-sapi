@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+      xmlns:os="http://www.mulesoft.org/schema/mule/os"
+      xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+
+  <sub-flow name="get-salesforce-access-token-sub-flow" doc:id="doc-f6535c20">
+    <flow-ref name="process-info-logger-sub-flow" doc:name="Call process-info-logger-sub-flow (Logger)" doc:id="doc-vwdykhhh" />
+    <try doc:name="Try Cached Salesforce Token" doc:id="doc-20774c36">
+      <os:retrieve key="salesforce_access_token" objectStore="SalesforceOAuthTokenStore" target="cachedSalesforceToken" doc:name="Retrieve Cached Salesforce Token" doc:id="doc-93563d45" />
+      <ee:transform doc:name="Set Token from Cache" doc:id="doc-efbb8077">
+        <ee:variables doc:id="doc-b1926d64">
+          <ee:set-variable variableName="salesforceAccessToken" doc:id="doc-3a5af9ad">
+            %dw 2.0
+output application/json
+---
+vars.cachedSalesforceToken.access_token default ''
+          </ee:set-variable>
+          <ee:set-variable variableName="salesforceInstanceUrl" doc:id="doc-b5ed5e9e">
+            %dw 2.0
+output application/json
+---
+vars.cachedSalesforceToken.instance_url default p('salesforce.host')
+          </ee:set-variable>
+        </ee:variables>
+      </ee:transform>
+      <error-handler>
+        <on-error-propagate type="ANY" doc:name="Try delegates to Global">
+          <raise-error type="SAPI:HANDLED" />
+        </on-error-propagate>
+      </error-handler>
+    </try>
+    <flow-ref name="process-info-logger-sub-flow" doc:name="Call process-info-logger-sub-flow (Logger)" doc:id="doc-fzftlc7o" />
+  </sub-flow>
+
+</mule>

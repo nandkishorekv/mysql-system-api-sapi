@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<sub-flow name="logger-info-debug-sub-flow" doc:id="61fae99e-e24e-478d-a137-97e608760ae8" >
+		<choice doc:name="Choice" doc:id="940ed6c7-54cd-4db2-98b4-88c2639bce6a" >
+			<when expression="#[vars.priority == p('priority.debug')]">
+				<logger level="DEBUG" doc:name="Debug Logger with Payload" doc:id="704861ff-4af3-4bef-88c1-9fbd5f106e05" message="#[%dw 2.0&#10;import * from dwl::logging::logger&#10;output application/json&#10;--- &#10;log(vars.logger.env, vars.logger.priority, vars.logger.tracePoint, vars.logger.process, vars.logger.sourceSystem, vars.logger.targetSystem, vars.logger.flowName, vars.logger.correlationId, vars.logger.api, vars.logger.content)]" />
+			</when>
+			<otherwise >
+				<logger level="INFO" doc:name="Info Logger without Payload" doc:id="533e2c4f-e637-41ab-876b-6113c203fba3" message="#[%dw 2.0&#10;import * from dwl::logging::logger&#10;output application/json&#10;---&#10;log(vars.logger.env, vars.logger.priority, vars.logger.tracePoint, vars.logger.process, vars.logger.sourceSystem, vars.logger.targetSystem, vars.logger.flowName, vars.logger.correlationId, vars.logger.api, vars.logger.content)]" />
+			</otherwise>
+		</choice>
+	</sub-flow>
+	<sub-flow name="logger-sub-flow" doc:id="e094739d-8118-453d-b78f-ee451e5fd9eb" >
+		<ee:transform doc:name="payload for logger" doc:id="3d3fbcfb-6f4d-4f5b-82d8-857fc35bbcbb">
+			<ee:message>
+			</ee:message>
+			<ee:variables>
+				<ee:set-variable variableName="logger"><![CDATA[%dw 2.0
+output application/json
+---
+{ 
+    "priority": vars.priority as String, 
+    "correlationId": (vars.apiDetails.correlationId default vars.correlationId) as String, 
+    "timestamp": now(),
+    "env": p('mule.env') as String,
+    "api": p('api.name'),  
+    "flowName" : vars.flowName default "",
+    "tracePoint": vars.tracePoint as String,
+    "process": vars.apiDetails.endpoint default vars.endpointDetails.endpoint default "",
+    "sourceSystem" : vars.apiDetails.source default vars.endpointDetails.source default " ",
+    "targetSystem" : vars.apiDetails.target default vars.endpointDetails.target  default " ",
+    "content": vars.logData default {}
+}
+]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<flow-ref doc:name="logger-info-debug-sub-flow" doc:id="d12dbf26-e120-4823-a0b0-24bd481935de" name="logger-info-debug-sub-flow"/>
+	</sub-flow>
+	<sub-flow name="request-received-logger-sub-flow" doc:id="dc618128-246b-4dbe-9f95-32f2800f2fca" >
+		<set-variable value="#[p('tracePoint.request')]" doc:name='tracePoint "REQUEST_RECEIVED"' doc:id="9b65a289-4d9c-40c1-b39a-57a87e21e1e7" variableName="tracePoint"/>
+		<set-variable value="#[p('priority.debug')]" doc:name='priority "DEBUG"' doc:id="bd041076-12e7-4fe6-99b9-62cc52fe3227" variableName="priority"/>
+		<flow-ref doc:name="logger-sub-flow" doc:id="f6e741be-089d-4ae3-a340-0224c129229d" name="logger-sub-flow" />
+	</sub-flow>
+	<sub-flow name="response-returned-logger-sub-flow" doc:id="f358f60a-ef13-47d3-b941-4e4106b6c0ae" >
+		<set-variable value="#[p('tracePoint.response')]" doc:name='tracePoint "RESPONSE_RETURNED"' doc:id="d73d93b7-6005-4c56-a4b8-9c16aa1b582d" variableName="tracePoint"/>
+		<set-variable value="#[p('priority.debug')]" doc:name='priority "DEBUG"' doc:id="e2a05375-a847-4909-a5b8-551571052f0b" variableName="priority" />
+		<flow-ref doc:name="logger-sub-flow" doc:id="e3a01a25-7dd0-4729-8bc4-4cb87c48102a" name="logger-sub-flow" />
+	
+</sub-flow>
+	<sub-flow name="flow-entry-logger-sub-flow" doc:id="e378b024-90b5-4d28-9603-9278a1ecccad" >
+		<set-variable value="#[p('tracePoint.entry')]" doc:name='tracePoint "FLOW_ENTRY"' doc:id="3566caaf-2311-492b-913a-f1884699f807" variableName="tracePoint"/>
+		<set-variable value="#[p('priority.info')]" doc:name='priority "INFO"' doc:id="52f87660-5e4b-437d-bb62-9ff60f7e9d61" variableName="priority" />
+		<flow-ref doc:name="logger-sub-flow" doc:id="fb371c45-e9bf-46a1-a021-5810de081161" name="logger-sub-flow" />
+	
+</sub-flow>
+	<sub-flow name="flow-complete-logger-sub-flow" doc:id="3305679e-e5fe-4da4-99a4-c996e43e5840" >
+		<set-variable value="#[p('tracePoint.complete')]" doc:name='tracePoint "FLOW_COMPLETE"' doc:id="87c42d3b-a3e5-4a4b-974e-3b587dfff8cb" variableName="tracePoint"/>
+		<set-variable value="#[p('priority.info')]" doc:name='priority "INFO"' doc:id="cb490787-4a75-437e-a0ac-fbc3869562de" variableName="priority" />
+		<flow-ref doc:name="logger-sub-flow" doc:id="0a8dd29f-904e-4661-b5e5-a0e497d68301" name="logger-sub-flow" />
+	
+</sub-flow>
+	<sub-flow name="process-info-logger-sub-flow" doc:id="fa848ac0-27e7-40f3-a91d-89af48eb7cfd" >
+		<set-variable value="#[p('tracePoint.info')]" doc:name='tracePoint "PROCESS_INFO"' doc:id="5c64d254-e415-4c1a-b37c-c4710688e665" variableName="tracePoint"/>
+		<set-variable value="#[p('priority.debug')]" doc:name='priority "DEBUG"' doc:id="ffbae9eb-8d0d-4f9a-9278-368f368073ed" variableName="priority" />
+		<ee:transform doc:name="payload for logger" doc:id="31aa7f10-fb43-40c8-995a-362106607f08">
+			<ee:message />
+			<ee:variables>
+				<ee:set-variable variableName="logger"><![CDATA[%dw 2.0
+output application/json
+---
+{ 
+    "priority": vars.priority as String, 
+    "correlationId": (vars.apiDetails.correlationId default vars.correlationId) as String as String, 
+    "timestamp": now(),
+    "env": p('mule.env') as String,
+    "api": p('api.name'),  
+    "flowName" : vars.flowName default "",
+    "tracePoint": vars.tracePoint as String,
+    "process": vars.apiDetails.endpoint default vars.endpointDetails.endpoint default "",
+    "sourceSystem" : vars.apiDetails.source default vars.endpointDetails.source default " ",
+    "targetSystem" : vars.apiDetails.target default vars.endpointDetails.target  default " ",
+    "content": vars.logData default {}
+}]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<flow-ref doc:name="logger-info-debug-sub-flow" doc:id="e4e5ac29-61d3-47fb-904e-709ef9e91bd4" name="logger-info-debug-sub-flow"/>
+	
+</sub-flow>
+	<sub-flow name="before-outbound-logger-sub-flow" doc:id="028473bd-ea8b-4817-bf3c-dbbcaab206a2" >
+		<set-variable value="#[p('tracePoint.before.outbound')]" doc:name='tracePoint "BEFORE_OUTBOUND"' doc:id="5c0f0d8c-96a9-4357-a4a4-446f09f888ee" variableName="tracePoint"/>
+		<set-variable value="#[p('priority.debug')]" doc:name='priority "DEBUG"' doc:id="db565acb-a7c5-4d98-9c6d-b7e68db0a9b2" variableName="priority" />
+		<flow-ref doc:name="logger-sub-flow" doc:id="24e0acd4-60bc-4a0d-ab8b-e13e995803d8" name="logger-sub-flow" />
+	
+</sub-flow>
+	<sub-flow name="after-outbound-logger-sub-flow" doc:id="42de5b6f-08f0-40f4-9993-32f594f89f17" >
+		<set-variable value="#[p('tracePoint.after.outbound')]" doc:name='tracePoint "AFTER_OUTBOUND"' doc:id="e2c1d9ae-99f6-42df-8538-5ddfe916a536" variableName="tracePoint"/>
+		<set-variable value="#[p('priority.debug')]" doc:name='priority "DEBUG"' doc:id="b553d95c-4da1-419a-a6f0-41159b4773d0" variableName="priority" />
+		<flow-ref doc:name="logger-sub-flow" doc:id="757ca6d4-0637-4f29-98c6-53dac499737d" name="logger-sub-flow" />
+	
+</sub-flow>
+	<sub-flow name="before-transform-message-logger-sub-flow" doc:id="ab241eb8-9a2e-431a-a78c-53759f8d2054" >
+		<set-variable value="#[p('tracePoint.before.transform')]" doc:name='tracePoint "BEFORE_TRANSFORM_MESSAGE"' doc:id="de39001c-caca-48cf-850d-8e489cf914d2" variableName="tracePoint"/>
+		<set-variable value="#[p('priority.info')]" doc:name='priority "INFO"' doc:id="a0eb76dd-8f1c-4a3c-aaf8-e5aa5109d348" variableName="priority" />
+		<flow-ref doc:name="logger-sub-flow" doc:id="7c12f8dc-2c21-4336-a672-d002aaf8300b" name="logger-sub-flow" />
+	
+</sub-flow>
+	<sub-flow name="after-transform-message-logger-sub-flow" doc:id="d23d314b-6496-4d7b-b1a2-b781512e12b8" >
+		<set-variable value="#[p('tracePoint.after.transform')]" doc:name='tracePoint "AFTER_TRANSFORM_MESSAGE"' doc:id="1f0b6029-fbde-4edf-a0fc-06ac332e2f64" variableName="tracePoint"/>
+		<set-variable value="#[p('priority.info')]" doc:name='priority "INFO"' doc:id="006ddce8-ff32-4af7-b87e-82ccc8b01f9b" variableName="priority" />
+		<flow-ref doc:name="logger-sub-flow" doc:id="3f9567e7-8e3c-4e3a-b844-4dedb83bbe3e" name="logger-sub-flow" />
+	
+</sub-flow>
+	<sub-flow name="error-logger-sub-flow" doc:id="4603312c-9b53-486f-9237-3b5212cf9302" >
+		<set-variable value='#[error.failingComponent as String default ""]' doc:name="component" doc:id="2e799fb4-2286-4eeb-a53a-e33d54937cc5" variableName="component" />
+		<set-variable value="#[p('tracePoint.error')]" doc:name='tracePoint "ERROR"' doc:id="f9d6926e-55ef-484d-a2ca-604e1cbdde08" variableName="tracePoint"/>
+		<set-variable value="#[p('priority.error')]" doc:name='priority "ERROR"' doc:id="95d9a3ff-8bfe-4f15-b8bc-217b176b1d2a" variableName="priority" />
+		<ee:transform doc:name="payload for error logger" doc:id="4716e4a4-a9b9-4c78-8066-3b564c10a565">
+			<ee:message />
+			<ee:variables>
+				<ee:set-variable variableName="logger"><![CDATA[%dw 2.0
+output application/json
+---
+{
+  "errorCode": vars.errorCode default "500",
+  "errorType": vars.errorType default "",
+  "errorMessage": vars.errorMessage default "",
+  "correlationId": vars.correlationId default "",
+  "timestamp": now(),
+  "environment": p('mule.env'),
+  "api": p('api.name'),  
+  "flowName" : vars.flowName default "",
+  "process": vars.endpointDetails.endpoint default "",
+   "sourceSystem" : vars.endpointDetails.source default " ",
+   "targetSystem" : vars.endpointDetails.target  default " ",
+  "content": vars.logData default {}
+}]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<logger level="ERROR" doc:name="Error Logger with Payload" doc:id="e4e36c81-8047-4a46-94c4-8f0819b16f4c" message="#[%dw 2.0&#10;import * from dwl::logging::logger&#10;output application/json&#10;--- &#10;log(vars.logger.environment, vars.priority, vars.tracePoint, vars.logger.process, vars.logger.sourceSystem, vars.logger.targetSystem, vars.logger.flowName, vars.logger.correlationId, vars.logger.api, vars.logger.content)]" />
+	
+</sub-flow>
+</mule>

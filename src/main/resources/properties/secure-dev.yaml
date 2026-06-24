@@ -1,0 +1,5 @@
+mq:
+  clientId: "your-client-id"
+  clientSecret: "your-client-secret"
+azureKeyVault:
+  accessToken: "CHANGEME"

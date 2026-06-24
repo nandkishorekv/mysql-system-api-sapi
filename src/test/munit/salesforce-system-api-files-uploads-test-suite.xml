@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:munit="http://www.mulesoft.org/schema/mule/munit" 
+	xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+	xmlns="http://www.mulesoft.org/schema/mule/core" 
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+
+	<munit:config name="salesforce-system-api-files-uploads-test-suite.xml" />
+
+	<munit:before-suite name="salesforce-system-api-files-uploads-before-suite" doc:id="1940818b-f2d4-4917-bf3c-d56af524a05d">
+		<munit-tools:store key="test.environment" doc:id="f1e61077-15a2-4280-aa6e-58ec9b6902df">
+			<munit-tools:value>#["test"]</munit-tools:value>
+		</munit-tools:store>
+		<logger level="INFO" doc:id="f94a3bd9-ca34-4ff4-847a-b06a66ca1a13"
+		        message="Starting salesforce-system-api-files-uploads Test Suite"/>
+	</munit:before-suite>
+
+	<munit:test name="post-salesforce-system-api-files-upload-flowTest"
+	            doc:id="b9a84b0c-273c-4d4a-ab83-ff9f9009ad9e"
+	            description="Test post-salesforce-system-api-files-upload-flow - flow execution">
+		<munit:behavior>
+			<munit-tools:mock-when doc:name="Mock process-info-logger-sub-flow" doc:id="a2691d95-30c0-4cb8-92cf-37aaddbfe4f4" processor="flow-ref">
+				<munit-tools:with-attributes>
+					<munit-tools:with-attribute whereValue="process-info-logger-sub-flow" attributeName="name"/>
+				</munit-tools:with-attributes>
+				<munit-tools:then-return>
+					<munit-tools:payload value='#[payload]' mediaType="application/json" encoding="UTF-8"/>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock process-info-logger-sub-flow" doc:id="36986747-106b-450a-8f59-51b3ad9b64b2" processor="flow-ref">
+				<munit-tools:with-attributes>
+					<munit-tools:with-attribute whereValue="process-info-logger-sub-flow" attributeName="name"/>
+				</munit-tools:with-attributes>
+				<munit-tools:then-return>
+					<munit-tools:payload value='#[payload]' mediaType="application/json" encoding="UTF-8"/>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock process-info-logger-sub-flow" doc:id="5b5f3fdf-e5d9-4237-ad77-6f0eff8abdd1" processor="flow-ref">
+				<munit-tools:with-attributes>
+					<munit-tools:with-attribute whereValue="process-info-logger-sub-flow" attributeName="name"/>
+				</munit-tools:with-attributes>
+				<munit-tools:then-return>
+					<munit-tools:payload value='#[payload]' mediaType="application/json" encoding="UTF-8"/>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock fetch-azure-keyvault-secret-sub-flow" doc:id="80bb34d9-7b80-4ba9-84ad-d9d732985541" processor="flow-ref">
+				<munit-tools:with-attributes>
+					<munit-tools:with-attribute whereValue="fetch-azure-keyvault-secret-sub-flow" attributeName="name"/>
+				</munit-tools:with-attributes>
+				<munit-tools:then-return>
+					<munit-tools:payload value='#[payload]' mediaType="application/json" encoding="UTF-8"/>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock get-salesforce-access-token-sub-flow" doc:id="59e5a5e7-de8e-4a07-83a1-2d5ef03896c9" processor="flow-ref">
+				<munit-tools:with-attributes>
+					<munit-tools:with-attribute whereValue="get-salesforce-access-token-sub-flow" attributeName="name"/>
+				</munit-tools:with-attributes>
+				<munit-tools:then-return>
+					<munit-tools:payload value='#[payload]' mediaType="application/json" encoding="UTF-8"/>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock process-info-logger-sub-flow" doc:id="c219421b-27ce-4b33-bab0-296d18ff899d" processor="flow-ref">
+				<munit-tools:with-attributes>
+					<munit-tools:with-attribute whereValue="process-info-logger-sub-flow" attributeName="name"/>
+				</munit-tools:with-attributes>
+				<munit-tools:then-return>
+					<munit-tools:payload value='#[payload]' mediaType="application/json" encoding="UTF-8"/>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock process-single-file-sub-flow" doc:id="56e47d23-c1b8-4cef-bae5-a3d45580e96e" processor="flow-ref">
+				<munit-tools:with-attributes>
+					<munit-tools:with-attribute whereValue="process-single-file-sub-flow" attributeName="name"/>
+				</munit-tools:with-attributes>
+				<munit-tools:then-return>
+					<munit-tools:payload value='#[payload]' mediaType="application/json" encoding="UTF-8"/>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock process-info-logger-sub-flow" doc:id="c277f753-0d91-4877-ac4c-982a9628bceb" processor="flow-ref">
+				<munit-tools:with-attributes>
+					<munit-tools:with-attribute whereValue="process-info-logger-sub-flow" attributeName="name"/>
+				</munit-tools:with-attributes>
+				<munit-tools:then-return>
+					<munit-tools:payload value='#[payload]' mediaType="application/json" encoding="UTF-8"/>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+
+		<munit:execution>
+			<!-- Setup Mule event with payload and attributes and variables -->
+			<munit:set-event doc:name="Set Event" doc:id="345a99ce-9e32-415f-8537-b027b763bbbc">
+				<munit:payload value='#[output application/json --- {
+  "correlationId": "test-correlationId",
+  "batchId": "test-batchId",
+  "files": []
+}]' mediaType="application/json" encoding="UTF-8" />
+				<munit:attributes value='#[{headers: {"x-correlation-id": "test-correlation-id-12345", authorization: "Bearer test-jwt-token-12345678901234567890"}}]' />
+				<munit:variables>
+					<munit:variable key="correlationId" value='#[1]' />
+					<munit:variable key="rawToken" value='#["test-rawToken"]' />
+					<munit:variable key="batchId" value='#[1]' />
+					<munit:variable key="incomingFiles" value='#["test-incomingFiles"]' />
+					<munit:variable key="filesSent" value='#["test-filesSent"]' />
+					<munit:variable key="filesUploaded" value='#[0]' />
+					<munit:variable key="filesUpserted" value='#[0]' />
+					<munit:variable key="filesUploadedToKnowledge" value='#[0]' />
+					<munit:variable key="uploadedFiles" value='#[output application/java --- {}]' />
+					<munit:variable key="upsertedFiles" value='#[output application/java --- {}]' />
+					<munit:variable key="failedFiles" value='#[output application/java --- {}]' />
+					<munit:variable key="errors" value='#[output application/java --- {}]' />
+					<munit:variable key="currentFile" value='#["test-currentFile"]' />
+					<munit:variable key="httpStatus" value='#[200]' />
+					<munit:variable key="outboundHeaders" value='#[output application/java --- {}]' />
+				</munit:variables>
+			</munit:set-event>
+
+			<flow-ref doc:name="Flow-ref to post-salesforce-system-api-files-upload-flow"
+			          doc:id="2ebb0206-9989-41b3-9474-febd9ae9a0e3"
+			          name="post-salesforce-system-api-files-upload-flow"/>
+		</munit:execution>
+
+		<munit:validation>
+			<munit-tools:assert-that doc:name="Assert payload not null"
+			                          doc:id="b45e178e-8333-4bc6-9293-18d0a670808f"
+			                          expression="#[payload]"
+			                          is="#[MunitTools::notNullValue()]"/>
+
+			<logger level="INFO" doc:id="6c33f24f-d43c-45f9-8b97-bbffed7c67cb"
+			        message="#['Test payload: ' ++ write(payload, 'application/json')]"/>
+		</munit:validation>
+	</munit:test>
+
+
+	<munit:after-suite name="salesforce-system-api-files-uploads-after-suite" doc:id="9bbe8f9b-e7db-4b8d-8d18-4345c92600de">
+		<logger level="INFO" doc:id="3b3bfc0d-ad3c-4247-b939-e7887c944f05"
+		        message="salesforce-system-api-files-uploads Test Suite completed successfully"/>
+	</munit:after-suite>
+
+</mule>

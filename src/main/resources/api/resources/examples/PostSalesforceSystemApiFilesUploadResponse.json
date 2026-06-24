@@ -1,0 +1,19 @@
+{
+  "correlationId": "sample-id-123",
+  "batchId": "sample-id-123",
+  "filesSent": 0,
+  "filesUploaded": 0,
+  "filesUpserted": 0,
+  "filesUploadedToKnowledge": 0,
+  "uploadedFiles": [],
+  "upsertedFiles": [],
+  "failedFiles": [],
+  "processingTimestamp": "2026-06-20T10:44:42.663Z",
+  "errors": [
+    {
+      "fileName": "Sample Name",
+      "errorCode": "sample_errorCode",
+      "errorMessage": "Operation completed successfully"
+    }
+  ]
+}

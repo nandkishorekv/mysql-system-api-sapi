@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+      xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+
+  <flow name="get-health-flow" doc:id="doc-e5c05bcb">
+    <logger level="INFO" message="#['get-health-flow | START | correlationId=' ++ correlationId]" category="com.mycompany.salesforce-system-api-sapi.get-health-flow" doc:name="Log Flow Start" />
+    <flow-ref name="process-info-logger-sub-flow" doc:name="Call process-info-logger-sub-flow (Logger)" doc:id="doc-ge7glx5o" />
+    <ee:transform doc:name="Build Health Response" doc:id="doc-5f34f29a">
+      <ee:message doc:id="doc-bb40616e">
+        <ee:set-payload resource="dw/build-health-response.dwl" />
+      </ee:message>
+      <ee:variables doc:id="doc-580a7187">
+        <ee:set-variable variableName="httpStatus" doc:id="doc-7dfffa22">
+          200
+        </ee:set-variable>
+      </ee:variables>
+    </ee:transform>
+    <flow-ref name="process-info-logger-sub-flow" doc:name="Call process-info-logger-sub-flow (Logger)" doc:id="doc-gvd5p794" />
+    <logger level="INFO" message="#['get-health-flow | END | correlationId=' ++ correlationId]" category="com.mycompany.salesforce-system-api-sapi.get-health-flow" doc:name="Log Flow End" />
+    <error-handler ref="globalErrorHandler" />
+  </flow>
+
+</mule>

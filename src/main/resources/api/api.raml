@@ -1,0 +1,59 @@
+#%RAML 1.0
+title: salesforce-system-api-sapi
+description: MuleSoft API with intelligent error handling and security
+version: v1
+baseUri: https://salesforce-system-api-sapi.cloudhub.io/api/v1
+mediaType: application/json
+
+
+uses:
+  traitsLib: /exchange_modules/aceb673b-30f8-4591-982c-8ed2cd883a70/istika-common-header-library/1.0.9/istika-common-header-library.raml
+
+traits:
+  error-response: !include /exchange_modules/aceb673b-30f8-4591-982c-8ed2cd883a70/istika-error-responses/1.0.6/istika-error-responses.raml
+
+
+/salesforce-system-api:
+  description: Operations for Salesforce-system-api
+  /files:
+    description: Operations for Salesforce-system-api/files/upload
+    /upload:
+      description: Operations for Salesforce-system-api/files/upload
+      post:
+        displayName: Create new salesforce-system-api/files/upload
+        is: [error-response,traitsLib.oauth-2-0,traitsLib.correlationId]
+        description: Create Salesforce-system-api/files/upload in the system
+        body:
+          application/json:
+            type: !include resources/schemas/PostSalesforceSystemApiFilesUploadRequest.raml
+            example: !include resources/examples/PostSalesforceSystemApiFilesUploadRequest.json
+        responses:
+          201:
+            description: Successful response
+            headers:
+              Content-Type:
+                type: string
+                required: true
+                example: application/json
+            body:
+              application/json:
+                type: !include resources/schemas/PostSalesforceSystemApiFilesUploadResponse.raml
+                example: !include resources/examples/PostSalesforceSystemApiFilesUploadResponse.json
+
+/health:
+  description: Operations for Health
+  get:
+    displayName: Retrieve all health
+    description: Endpoint to get All Health Details
+    responses:
+      200:
+        description: Successful response
+        headers:
+          Content-Type:
+            type: string
+            required: true
+            example: application/json
+        body:
+          application/json:
+            type: !include resources/schemas/GetHealthResponse.raml
+            example: !include resources/examples/GetHealthResponse.json

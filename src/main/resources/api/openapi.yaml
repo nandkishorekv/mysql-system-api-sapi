@@ -1,0 +1,130 @@
+openapi: 3.0.0
+info:
+  title: salesforce-system-api-sapi
+  version: 1.0.0
+  description: 'MuleSoft API: salesforce-system-api-sapi'
+servers:
+  - url: 'https://salesforce-system-api-sapi.cloudhub.io/api/v1'
+    description: CloudHub 2.0 deployment
+paths:
+  /salesforce-system-api/files/upload:
+    post:
+      summary: POST /salesforce-system-api/files/upload
+      operationId: post_salesforce_system_api_files_upload
+      tags:
+        - salesforce-system-api-sapi
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  errorCode:
+                    type: string
+                  message:
+                    type: string
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  errorCode:
+                    type: string
+                  message:
+                    type: string
+  /health:
+    get:
+      summary: GET /health
+      operationId: get_health
+      tags:
+        - salesforce-system-api-sapi
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  errorCode:
+                    type: string
+                  message:
+                    type: string
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  errorCode:
+                    type: string
+                  message:
+                    type: string
+components:
+  schemas:
+    Salesforce System APIRequest:
+      type: object
+      properties:
+        correlationId:
+          type: string
+        batchId:
+          type: string
+        files:
+          type: array
+      required:
+        - correlationId
+        - batchId
+        - files
+    Salesforce System APIResponse:
+      type: object
+      properties:
+        status:
+          type: string
+        apiName:
+          type: string
+        version:
+          type: string
+        timestamp:
+          type: string
+        uptime:
+          type: number
+        salesforceConnectivityStatus:
+          type: string
+      required:
+        - status
+        - apiName
+        - version
+        - timestamp
+        - uptime
+        - salesforceConnectivityStatus

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+    <!-- Remote appender active: splunk. Configure properties as documented in the appender block below. -->
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d{ISO8601} [%t] %-5p %c{1} - %msg%n"/>
+        </Console>
+
+        <!-- Log path/level externalized: override with -Dlog.path=/var/log -Dlog.level=DEBUG -->
+        <RollingFile name="FileAppender"
+                     fileName="${sys:log.path:-logs}/salesforce-system-api-sapi.log"
+                     filePattern="${sys:log.path:-logs}/salesforce-system-api-sapi-%d{yyyy-MM-dd}-%i.log">
+            <PatternLayout>
+                <Pattern>%d{ISO8601} [%t] %-5p %c{1} - %msg%n</Pattern>
+            </PatternLayout>
+            <Policies>
+                <TimeBasedTriggeringPolicy />
+                <SizeBasedTriggeringPolicy size="10 MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="10"/>
+        </RollingFile>
+        <!-- Splunk HEC appender. Values come from common-properties.yaml.
+             Required properties:
+               splunk.hec.url   — e.g. https://splunk.example.com:8088/services/collector/event
+               splunk.hec.token — HEC token (store via secure properties: ${secure::splunk.hec.token})
+               splunk.hec.index — Splunk index name
+               splunk.hec.source — application identifier
+        -->
+        <SplunkHttp name="SplunkHec"
+                    url="${sys:splunk.hec.url}"
+                    token="${sys:splunk.hec.token}"
+                    index="${sys:splunk.hec.index}"
+                    source="${sys:splunk.hec.source}"
+                    sourceType="_json"
+                    messageFormat="json"
+                    disableCertificateValidation="false">
+            <PatternLayout pattern="%d{ISO8601} [%t] %-5p %c{1} - %msg%n"/>
+        </SplunkHttp>
+    </Appenders>
+
+    <Loggers>
+        <!-- Mule Core Loggers -->
+        <Logger name="org.mule.runtime" level="INFO"/>
+        <Logger name="org.mule.service.http" level="INFO"/>
+        <Logger name="org.mule.module.apikit" level="INFO"/>
+
+        <!-- Application Logger (level externalized via -Dlog.level) -->
+        <Logger name="com.mycompany" level="${sys:log.level:-INFO}"/>
+
+        <!-- Connector Loggers -->
+        <Logger name="com.mulesoft.connectors" level="INFO"/>
+        <Logger name="org.mule.extension.http" level="WARN"/>
+        <Logger name="org.mule.extension.db" level="INFO"/>
+        <Logger name="com.mulesoft.mule.runtime.module.salesforce" level="INFO"/>
+
+        <!-- DataWeave Logger -->
+        <Logger name="org.mule.weave" level="INFO"/>
+
+        <!-- Root Logger (level externalized via -Dlog.level) -->
+        <Root level="${sys:log.level:-INFO}">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="FileAppender"/>
+            <AppenderRef ref="SplunkHec"/>
+        </Root>
+    </Loggers>
+</Configuration>

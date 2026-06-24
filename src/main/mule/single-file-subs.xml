@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+
+  <sub-flow name="process-single-file-sub-flow" doc:id="doc-8364c41c">
+    <flow-ref name="process-info-logger-sub-flow" doc:name="Call process-info-logger-sub-flow (Logger)" doc:id="doc-aszp6hdl" />
+    <until-successful maxRetries="${api.retry.maxRetries}" millisBetweenRetries="${api.retry.delayMs}" doc:name="Retry downstream call">
+      <http:request method="GET" path="#['/services/data/' ++ p('salesforce.apiVersion') ++ '/query']" config-ref="SalesforceConfig" doc:name="SOQL Query ContentVersion by PathOnClient" target="soqlQueryResult" doc:id="doc-b73c267f">
+        <http:headers>#[{'Authorization': 'Bearer ' ++ vars.salesforceAccessToken, 'X-Correlation-Id': vars.correlationId default ''}]</http:headers>
+        <http:query-params>#[{ q: "SELECT Id, ContentDocumentId FROM ContentVersion WHERE PathOnClient = '" ++ vars.currentFile.fileName ++ "'" }]</http:query-params>
+      </http:request>
+    </until-successful>
+    <flow-ref name="process-info-logger-sub-flow" doc:name="Call process-info-logger-sub-flow (Logger)" doc:id="doc-nt436l6x" />
+    <choice doc:name="ContentDocumentId Exists?" doc:id="doc-e3e3b003">
+      <when expression="#[vars.soqlQueryResult.totalSize &amp;gt; 0]" doc:id="doc-3229d2d7">
+        <ee:transform doc:name="Extract Existing ContentVersion Id" doc:id="doc-258f571f">
+          <ee:variables doc:id="doc-c44dad46">
+            <ee:set-variable variableName="existingContentVersionId" doc:id="doc-96735371">
+              %dw 2.0
+output application/json
+---
+vars.soqlQueryResult.records[0].Id default ''
+            </ee:set-variable>
+            <ee:set-variable variableName="existingContentDocumentId" doc:id="doc-df3d4420">
+              %dw 2.0
+output application/json
+---
+vars.soqlQueryResult.records[0].ContentDocumentId default ''
+            </ee:set-variable>
+          </ee:variables>
+        </ee:transform>
+        <http:request method="PATCH" path="#['/services/data/' ++ p('salesforce.apiVersion') ++ '/sobjects/ContentVersion/' ++ vars.existingContentVersionId]" config-ref="SalesforceConfig" doc:name="Update Existing ContentVersion (Upsert)" target="upsertResult" doc:id="doc-40d1204d">
+          <http:body>#[output application/json
+--- { VersionData: vars.currentFile.fileContent, PathOnClient: vars.currentFile.fileName, Title: vars.currentFile.fileName }]</http:body>
+          <http:headers>#[{'Authorization': 'Bearer ' ++ vars.salesforceAccessToken, 'Content-Type': 'application/json', 'X-Correlation-Id': vars.correlationId default ''}]</http:headers>
+        </http:request>
+        <ee:transform doc:name="Track Upserted File" doc:id="doc-150c522c">
+          <ee:variables doc:id="doc-2c2e296e">
+            <ee:set-variable variableName="filesUpserted" doc:id="doc-45e261f7">
+              %dw 2.0
+output application/json
+---
+(vars.filesUpserted default 0) + 1
+            </ee:set-variable>
+            <ee:set-variable variableName="upsertedFiles" doc:id="doc-f36c84ef">
+              %dw 2.0
+output application/json
+---
+(vars.upsertedFiles default []) ++ [vars.currentFile.fileName default '']
+            </ee:set-variable>
+          </ee:variables>
+        </ee:transform>
+        <flow-ref name="process-info-logger-sub-flow" doc:name="Call process-info-logger-sub-flow (Logger)" doc:id="doc-n4l99tdi" />
+      </when>
+      <otherwise doc:id="doc-0b81f544">
+        <http:request method="POST" path="#['/services/data/' ++ p('salesforce.apiVersion') ++ '/sobjects/ContentVersion']" config-ref="SalesforceConfig" doc:name="Create New ContentVersion" target="createCVResult" doc:id="doc-59c51b2d">
+          <http:body>#[output application/json
+--- { VersionData: vars.currentFile.fileContent, PathOnClient: vars.currentFile.fileName, Title: vars.currentFile.fileName, Origin: 'H' }]</http:body>
+          <http:headers>#[{'Authorization': 'Bearer ' ++ vars.salesforceAccessToken, 'Content-Type': 'application/json', 'X-Correlation-Id': vars.correlationId default ''}]</http:headers>
+        </http:request>
+        <ee:transform doc:name="Store New ContentVersion Id" doc:id="doc-3752572d">
+          <ee:variables doc:id="doc-c6f35146">
+            <ee:set-variable variableName="newContentVersionId" doc:id="doc-f87d3e69">
+              %dw 2.0
+output application/json
+---
+vars.createCVResult.id default ''
+            </ee:set-variable>
+          </ee:variables>
+        </ee:transform>
+        <until-successful maxRetries="${api.retry.maxRetries}" millisBetweenRetries="${api.retry.delayMs}" doc:name="Retry downstream call">
+          <http:request method="GET" path="#['/services/data/' ++ p('salesforce.apiVersion') ++ '/query']" config-ref="SalesforceConfig" doc:name="Query ContentDocumentId from New ContentVersion" target="contentDocIdQueryResult" doc:id="doc-e66b8a52">
+            <http:headers>#[{'Authorization': 'Bearer ' ++ vars.salesforceAccessToken, 'X-Correlation-Id': vars.correlationId default ''}]</http:headers>
+            <http:query-params>#[{ q: "SELECT ContentDocumentId FROM ContentVersion WHERE Id = '" ++ vars.newContentVersionId ++ "'" }]</http:query-params>
+          </http:request>
+        </until-successful>
+        <ee:transform doc:name="Store New ContentDocumentId" doc:id="doc-ba57092e">
+          <ee:variables doc:id="doc-571ded39">
+            <ee:set-variable variableName="newContentDocumentId" doc:id="doc-a0e27bbf">
+              %dw 2.0
+output application/json
+---
+vars.contentDocIdQueryResult.records[0].ContentDocumentId default ''
+            </ee:set-variable>
+          </ee:variables>
+        </ee:transform>
+        <http:request method="POST" path="#['/services/data/' ++ p('salesforce.apiVersion') ++ '/composite']" config-ref="SalesforceConfig" doc:name="Salesforce Composite Request - Link Knowledge, ContentDocumentLink, ContentWorkspaceDoc" target="compositeResult" doc:id="doc-6cc4e601">
+          <http:body>#[output application/json
+--- { allOrNone: false, compositeRequest: [ { method: 'PATCH', url: '/services/data/' ++ p('salesforce.apiVersion') ++ '/sobjects/ContentDocument/' ++ vars.newContentDocumentId, referenceId: 'linkKnowledge', body: { PublishStatus: 'PendingReview' } }, { method: 'POST', url: '/services/data/' ++ p('salesforce.apiVersion') ++ '/sobjects/ContentDocumentLink', referenceId: 'createContentDocumentLink', body: { ContentDocumentId: vars.newContentDocumentId, LinkedEntityId: p('salesforce.linkedEntityId'), ShareType: 'V' } }, { method: 'POST', url: '/services/data/' ++ p('salesforce.apiVersion') ++ '/sobjects/ContentWorkspaceDoc', referenceId: 'createContentWorkspaceDoc', body: { ContentDocumentId: vars.newContentDocumentId, ContentWorkspaceId: p('salesforce.contentWorkspaceId') } } ] }]</http:body>
+          <http:headers>#[{'Authorization': 'Bearer ' ++ vars.salesforceAccessToken, 'Content-Type': 'application/json', 'X-Correlation-Id': vars.correlationId default ''}]</http:headers>
+        </http:request>
+        <flow-ref name="process-info-logger-sub-flow" doc:name="Call process-info-logger-sub-flow (Logger)" doc:id="doc-tid4nsy0" />
+        <ee:transform doc:name="Track Uploaded and Knowledge Files" doc:id="doc-9c353872">
+          <ee:variables doc:id="doc-0505d418">
+            <ee:set-variable variableName="filesUploaded" doc:id="doc-6bdd36c3">
+              %dw 2.0
+output application/json
+---
+(vars.filesUploaded default 0) + 1
+            </ee:set-variable>
+            <ee:set-variable variableName="filesUploadedToKnowledge" doc:id="doc-b57709a6">
+              %dw 2.0
+output application/json
+---
+(vars.filesUploadedToKnowledge default 0) + 1
+            </ee:set-variable>
+            <ee:set-variable variableName="uploadedFiles" doc:id="doc-d3e0a7ce">
+              %dw 2.0
+output application/json
+---
+(vars.uploadedFiles default []) ++ [vars.currentFile.fileName default '']
+            </ee:set-variable>
+          </ee:variables>
+        </ee:transform>
+        <flow-ref name="process-info-logger-sub-flow" doc:name="Call process-info-logger-sub-flow (Logger)" doc:id="doc-dsf4negd" />
+      </otherwise>
+    </choice>
+    <flow-ref name="process-info-logger-sub-flow" doc:name="Call process-info-logger-sub-flow (Logger)" doc:id="doc-gzctzuj2" />
+  </sub-flow>
+
+</mule>

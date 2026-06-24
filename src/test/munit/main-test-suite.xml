@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:munit="http://www.mulesoft.org/schema/mule/munit" 
+	xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+	xmlns="http://www.mulesoft.org/schema/mule/core" 
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+
+	<munit:config name="main-test-suite.xml" />
+
+	<munit:before-suite name="main-before-suite" doc:id="3d3694be-7894-4505-a823-51e164f3dd1e">
+		<munit-tools:store key="test.environment" doc:id="d3309840-51c6-4cfc-a25f-4a80a16307f8">
+			<munit-tools:value>#["test"]</munit-tools:value>
+		</munit-tools:store>
+		<logger level="INFO" doc:id="716cf67a-ee6b-4008-a9e8-a9a7e8690b79"
+		        message="Starting main Test Suite"/>
+	</munit:before-suite>
+
+	<munit:test name="consume-dlq-reprocessing-flowTest"
+	            doc:id="4a1d2107-e30f-4396-a0f5-0626f66c6ece"
+	            description="Test consume-dlq-reprocessing-flow - subscriber">
+		<munit:behavior>
+			<munit-tools:mock-when doc:name="Mock anypoint-mq:subscriber"
+			                        doc:id="15f9d1fa-fbb3-4a7d-9661-d86eb07f4a5c"
+			                        processor="anypoint-mq:subscriber">
+				<munit-tools:with-attributes>
+					<munit-tools:with-attribute whereValue="doc-e95de79c" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return>
+					<munit-tools:payload value='#[output application/java --- {"id":1,"success":true}]'
+					                      mediaType="application/java"
+					                      encoding="UTF-8"/>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock process-info-logger-sub-flow" doc:id="49d6234f-bd48-4a38-9b36-73f424e38334" processor="flow-ref">
+				<munit-tools:with-attributes>
+					<munit-tools:with-attribute whereValue="process-info-logger-sub-flow" attributeName="name"/>
+				</munit-tools:with-attributes>
+				<munit-tools:then-return>
+					<munit-tools:payload value='#[payload]' mediaType="application/json" encoding="UTF-8"/>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock process-info-logger-sub-flow" doc:id="8fb312f2-82ca-4987-8dc7-33eca36f89ac" processor="flow-ref">
+				<munit-tools:with-attributes>
+					<munit-tools:with-attribute whereValue="process-info-logger-sub-flow" attributeName="name"/>
+				</munit-tools:with-attributes>
+				<munit-tools:then-return>
+					<munit-tools:payload value='#[payload]' mediaType="application/json" encoding="UTF-8"/>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock process-info-logger-sub-flow" doc:id="907aa49e-0548-4113-b85d-9e970b125872" processor="flow-ref">
+				<munit-tools:with-attributes>
+					<munit-tools:with-attribute whereValue="process-info-logger-sub-flow" attributeName="name"/>
+				</munit-tools:with-attributes>
+				<munit-tools:then-return>
+					<munit-tools:payload value='#[payload]' mediaType="application/json" encoding="UTF-8"/>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+
+		<munit:execution>
+			<!-- Setup Mule event with variables -->
+			<munit:set-event doc:name="Set Event" doc:id="0ade2d82-b21a-4d36-b501-c3816e520416">
+				<munit:variables>
+					<munit:variable key="dlqMessage" value='#["test-dlqMessage"]' />
+				</munit:variables>
+			</munit:set-event>
+
+			<flow-ref doc:name="Flow-ref to consume-dlq-reprocessing-flow"
+			          doc:id="362b0be5-b8c8-4793-ac55-fa61bcae4134"
+			          name="consume-dlq-reprocessing-flow"/>
+		</munit:execution>
+
+		<munit:validation>
+			<munit-tools:assert-that doc:name="Assert payload not null"
+			                          doc:id="7cf07d4c-3b5f-4d2d-932b-5fdbede00edc"
+			                          expression="#[payload]"
+			                          is="#[MunitTools::notNullValue()]"/>
+
+			<logger level="INFO" doc:id="1bfb4f83-e691-4236-b8b8-2d71ea195a96"
+			        message="#['Test payload: ' ++ write(payload, 'application/json')]"/>
+		</munit:validation>
+	</munit:test>
+
+	<munit:test name="daily-token-cache-refresh-flowTest"
+	            doc:id="f02a4400-7b53-4b86-893f-f3425b0527dc"
+	            description="Test daily-token-cache-refresh-flow - remove">
+		<munit:behavior>
+			<munit-tools:mock-when doc:name="Mock os:remove"
+			                        doc:id="11389974-0d7d-415a-a80c-5f0201d0b049"
+			                        processor="os:remove">
+				<munit-tools:with-attributes>
+					<munit-tools:with-attribute whereValue="doc-409584c3" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return>
+					<munit-tools:payload value='#[output application/java --- {"success":true}]'
+					                      mediaType="application/java"
+					                      encoding="UTF-8"/>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock process-info-logger-sub-flow" doc:id="bcf1d3d5-c0d4-411b-86df-c2a6d3a3844a" processor="flow-ref">
+				<munit-tools:with-attributes>
+					<munit-tools:with-attribute whereValue="process-info-logger-sub-flow" attributeName="name"/>
+				</munit-tools:with-attributes>
+				<munit-tools:then-return>
+					<munit-tools:payload value='#[payload]' mediaType="application/json" encoding="UTF-8"/>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock process-info-logger-sub-flow" doc:id="afdfcec6-3c29-4b1a-b1dd-df61c5904b7e" processor="flow-ref">
+				<munit-tools:with-attributes>
+					<munit-tools:with-attribute whereValue="process-info-logger-sub-flow" attributeName="name"/>
+				</munit-tools:with-attributes>
+				<munit-tools:then-return>
+					<munit-tools:payload value='#[payload]' mediaType="application/json" encoding="UTF-8"/>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+
+		<munit:execution>
+			<flow-ref doc:name="Flow-ref to daily-token-cache-refresh-flow"
+			          doc:id="94c8cebd-e5d1-4e50-a328-ce15c6bf0ff8"
+			          name="daily-token-cache-refresh-flow"/>
+		</munit:execution>
+
+		<munit:validation>
+			<munit-tools:assert-that doc:name="Assert payload not null"
+			                          doc:id="3b4ceeec-68d8-4419-aacb-d2fa8beeb254"
+			                          expression="#[payload]"
+			                          is="#[MunitTools::notNullValue()]"/>
+
+			<logger level="INFO" doc:id="59f25af4-b23f-4899-b048-f0b66a2bf834"
+			        message="#['Test payload: ' ++ write(payload, 'application/json')]"/>
+		</munit:validation>
+	</munit:test>
+
+
+	<munit:after-suite name="main-after-suite" doc:id="388f4c94-9e10-4316-ae64-becb4bd5d100">
+		<logger level="INFO" doc:id="ffb9b89f-fea3-4a6b-8afa-6d531d47d07b"
+		        message="main Test Suite completed successfully"/>
+	</munit:after-suite>
+
+</mule>
