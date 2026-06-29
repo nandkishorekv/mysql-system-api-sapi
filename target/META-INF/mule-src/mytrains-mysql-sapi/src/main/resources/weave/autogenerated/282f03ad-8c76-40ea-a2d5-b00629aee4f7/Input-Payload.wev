@@ -1,0 +1,5 @@
+%dw 2.0
+
+type auto_282f03ad_8c76_40ea_a2d5_b00629aee4f7_Input_Payload = Array<{|  ALERT_TRANSACTION_ID: Number,   SUBSCRIPTION_ID: Number,   DELAY_TYPE_FLAG: String,   NOTIFICATION_STATUS: String,   NOTIFICATION_FAILURE_DETAIL: String,   DELAY_TIME: Number,   CREATION_TIMESTAMP: String|}> {"mediaType": "application/json",
+"encoding": "UTF-8"}
+

@@ -1,0 +1,420 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd ">
+    <apikit:config name="mytrains-mysql-ws-config" api="resource::2357905f-548b-4555-a7bc-d9cfc935baad:mytrains-mysql-ws:1.0.4:raml:zip:mytrains-mysql-ws.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+    <flow name="mytrains-mysql-ws-main">
+        <http:listener config-ref="HTTP_Listener_config" path="/api/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body>#[payload]</http:body>
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:router config-ref="mytrains-mysql-ws-config" />
+        <error-handler ref="commonErrorHandler">
+            
+        </error-handler>
+    </flow>
+    <flow name="mytrains-mysql-ws-console">
+        <http:listener config-ref="HTTP_Listener_config" path="/console/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body>#[payload]</http:body>
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:console config-ref="mytrains-mysql-ws-config" />
+        <error-handler>
+            <on-error-propagate type="APIKIT:NOT_FOUND">
+                <ee:transform doc:name="Transform Message">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Resource not found"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">404</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+    <flow name="get:\user\(userId)\subscription\(subscriptionId)\alert:mytrains-mysql-ws-config">
+        <!-- [STUDIO:"Transform Message"]<ee:transform doc:name="Transform Message">
+            <ee:variables>
+                <ee:set-variable variableName="userId">attributes.uriParams.'userId'</ee:set-variable>
+                <ee:set-variable variableName="subscriptionId">attributes.uriParams.'subscriptionId'</ee:set-variable>
+            </ee:variables>
+        </ee:transform> [STUDIO] -->
+        <!-- [STUDIO:"Transform Message"]<ee:transform doc:name="Transform Message">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+&#45;&#45;-
+[
+  {
+    ALERT_TRANSACTION_ID: 17,
+    SUBSCRIPTION_ID: 115,
+    DELAY_TYPE_FLAG: "Delayed",
+    NOTIFICATION_STATUS: "Sent",
+    NOTIFICATION_FAILURE_DETAIL: "Failed to access database",
+    DELAY_TIME: 6,
+    CREATION_TIMESTAMP: "2024-11-12T17:30:01"
+  }, 
+  {
+    ALERT_TRANSACTION_ID: 18,
+    SUBSCRIPTION_ID: 115,
+    DELAY_TYPE_FLAG: "Delayed",
+    NOTIFICATION_STATUS: "Sent",
+    NOTIFICATION_FAILURE_DETAIL: "Failed to access database",
+    DELAY_TIME: 6,
+    CREATION_TIMESTAMP: "2024-11-12T17:31:35"
+  }
+&#93; as Array {encoding: "UTF-8", mediaType: "application/json"}&#93;&#93;></ee:set-payload>
+            </ee:message>
+        </ee:transform> [STUDIO] -->
+        <flow-ref doc:name="Flow Reference" doc:id="673c5eac-cc4b-4894-9d38-b44c31714fb3" name="getAlertsBySubscriptionId" />
+		<error-handler ref="commonErrorHandler" />
+    </flow>
+    <flow name="get:\health:mytrains-mysql-ws-config">
+        <!-- [STUDIO:"Transform Message"]<ee:transform doc:name="Transform Message">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+&#45;&#45;-
+{
+  status: "OK",
+  apiName: "MyTrains-Mysql-sapi",
+  apiVersion: "1.3.0",
+  timestamp: "2020-08-01T13:15:25.000Z"
+} as Object {encoding: "UTF-8", mediaType: "application/json"}&#93;&#93;></ee:set-payload>
+            </ee:message>
+        </ee:transform> [STUDIO] -->
+        <flow-ref doc:name="Flow Reference" doc:id="1d99b9ef-db19-403a-9c27-fd06c1ce4164" name="getHealth" />
+		<error-handler ref="commonErrorHandler" />
+    </flow>
+    <flow name="get:\user\(userId)\subscription:mytrains-mysql-ws-config">
+        <!-- [STUDIO:"Transform Message"]<ee:transform doc:name="Transform Message">
+            <ee:variables>
+                <ee:set-variable variableName="userId">attributes.uriParams.'userId'</ee:set-variable>
+            </ee:variables>
+        </ee:transform> [STUDIO] -->
+        <!-- [STUDIO:"Transform Message"]<ee:transform doc:name="Transform Message">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+&#45;&#45;-
+[
+  {
+    SUBSCRIPTION_ID: 555,
+    USER_ID: "33333",
+    STATUS_TYPE_ID: 123,
+    SOURCE_LOCATION: "KDV",
+    DESTINATION_LOCATION: "AWR",
+    FROM_TIME: "1970-01-01T12:12:00",
+    TO_TIME: "1970-01-01T18:12:00",
+    ADVANCE_NOTIFY_TIME_MIN: 38,
+    CREATION_TIMESTAMP: "2025-08-06T18:29:21",
+    UPDATED_TIMESTAMP: "2025-08-06T18:29:21"
+  }, 
+  {
+    SUBSCRIPTION_ID: 400,
+    USER_ID: "33333",
+    STATUS_TYPE_ID: 12,
+    SOURCE_LOCATION: "PRE",
+    DESTINATION_LOCATION: "BHM",
+    FROM_TIME: "1970-01-01T12:12:00",
+    TO_TIME: "1970-01-01T18:12:00",
+    ADVANCE_NOTIFY_TIME_MIN: 38,
+    CREATION_TIMESTAMP: "2025-08-06T18:29:21",
+    UPDATED_TIMESTAMP: "2025-08-06T18:29:21"
+  }
+&#93; as Array {encoding: "UTF-8", mediaType: "application/json"}&#93;&#93;></ee:set-payload>
+            </ee:message>
+        </ee:transform> [STUDIO] -->
+        <flow-ref doc:name="Flow Reference" doc:id="6bff9999-6533-496d-b0b7-2dc758af73ef" name="getUserIdSubscription" />
+		<error-handler ref="commonErrorHandler" />
+    </flow>
+    <flow name="get:\subscriptionByAlertTime:mytrains-mysql-ws-config">
+        <!-- [STUDIO:"Transform Message"]<ee:transform doc:name="Transform Message">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+&#45;&#45;-
+[
+  {
+    SUBSCRIPTION_ID: 555,
+    USER_ID: "33333",
+    STATUS_TYPE_ID: 123,
+    SOURCE_LOCATION: "KDV",
+    DESTINATION_LOCATION: "AWR",
+    FROM_TIME: "1970-01-01T12:12:00",
+    TO_TIME: "1970-01-01T18:12:00",
+    ADVANCE_NOTIFY_TIME_MIN: 38,
+    CREATION_TIMESTAMP: "2025-08-06T18:29:21",
+    UPDATED_TIMESTAMP: "2025-08-06T18:29:21"
+  }, 
+  {
+    SUBSCRIPTION_ID: 1250,
+    USER_ID: "uid001",
+    STATUS_TYPE_ID: 123,
+    SOURCE_LOCATION: "KDV",
+    DESTINATION_LOCATION: "AWR",
+    FROM_TIME: "1970-01-01T12:12:00",
+    TO_TIME: "1970-01-01T18:12:00",
+    ADVANCE_NOTIFY_TIME_MIN: 38,
+    CREATION_TIMESTAMP: "2025-08-06T18:10:18",
+    UPDATED_TIMESTAMP: "2025-08-06T18:10:18"
+  }
+&#93; as Array {encoding: "UTF-8", mediaType: "application/json"}&#93;&#93;></ee:set-payload>
+            </ee:message>
+        </ee:transform> [STUDIO] -->
+        <flow-ref doc:name="Flow Reference" doc:id="c7719b4d-15bb-4e44-8903-dbece9692919" name="getSubscriptionByAlertTime" />
+		<error-handler ref="commonErrorHandler" />
+    </flow>
+    <flow name="get:\user:mytrains-mysql-ws-config">
+        <!-- [STUDIO:"Transform Message"]<ee:transform doc:name="Transform Message">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+&#45;&#45;-
+[
+  {
+    USER_ID: "KBGF432",
+    EMAIL_ID: "kaberi2@gmail.com",
+    STATUS_TYPE_ID: 1,
+    FIRST_NAME: "kaberi",
+    LAST_NAME: "Dutta",
+    PHONE_NUMBER: 762991811,
+    CREATED_TIMESTAMP: "2024-11-07T04:38:13",
+    UPDATED_TIMESTAMP: "2024-11-07T04:38:13"
+  }, 
+  {
+    USER_ID: "KBGF435",
+    EMAIL_ID: "kaberi@gmail.com",
+    STATUS_TYPE_ID: 1,
+    FIRST_NAME: "kaberi",
+    LAST_NAME: "Dutta",
+    PHONE_NUMBER: 762991811,
+    CREATED_TIMESTAMP: "2024-11-07T04:05:02",
+    UPDATED_TIMESTAMP: "2024-11-07T04:05:02"
+  }
+&#93; as Array {encoding: "UTF-8", mediaType: "application/json"}&#93;&#93;></ee:set-payload>
+            </ee:message>
+        </ee:transform> [STUDIO] -->
+        <flow-ref doc:name="Flow Reference" doc:id="c7a1d695-136f-4d59-b8e1-72c1515b9b79" name="getUser" />
+		<error-handler ref="commonErrorHandler" />
+    </flow>
+    <flow name="get:\user\(userId)\subscription\(subscriptionId)\alert\(alertId):mytrains-mysql-ws-config">
+        <ee:transform doc:name="Transform Message">
+            <ee:variables>
+                <ee:set-variable variableName="userId">attributes.uriParams.'userId'</ee:set-variable>
+                <ee:set-variable variableName="subscriptionId">attributes.uriParams.'subscriptionId'</ee:set-variable>
+                <ee:set-variable variableName="alertId">attributes.uriParams.'alertId'</ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+        <ee:transform doc:name="Transform Message">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+  ALERT_TRANSACTION_ID: 17,
+  SUBSCRIPTION_ID: 115,
+  DELAY_TYPE_FLAG: "Delayed",
+  NOTIFICATION_STATUS: "Sent",
+  NOTIFICATION_FAILURE_DETAIL: "Failed to access database",
+  DELAY_TIME: 6,
+  CREATION_TIMESTAMP: "2024-11-12T17:30:01"
+} as Object {encoding: "UTF-8", mediaType: "application/json"}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+        <flow-ref doc:name="Flow Reference" doc:id="204a4586-dd69-47ee-a27c-220b2d482885" name="getAlertByAlertId" />
+		<error-handler ref="commonErrorHandler" />
+    </flow>
+    <flow name="get:\user\(userId)\subscription\(subscriptionId):mytrains-mysql-ws-config">
+        <ee:transform doc:name="Transform Message">
+            <ee:variables>
+                <ee:set-variable variableName="userId">attributes.uriParams.'userId'</ee:set-variable>
+                <ee:set-variable variableName="subscriptionId">attributes.uriParams.'subscriptionId'</ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+        <ee:transform doc:name="Transform Message">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+  SUBSCRIPTION_ID: 555,
+  USER_ID: "33333",
+  STATUS_TYPE_ID: 123,
+  SOURCE_LOCATION: "KDV",
+  DESTINATION_LOCATION: "AWR",
+  FROM_TIME: "1970-01-01T12:12:00",
+  TO_TIME: "1970-01-01T18:12:00",
+  ADVANCE_NOTIFY_TIME_MIN: 38,
+  CREATION_TIMESTAMP: "2025-08-06T18:29:21",
+  UPDATED_TIMESTAMP: "2025-08-06T18:29:21"
+} as Object {encoding: "UTF-8", mediaType: "application/json"}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+        <flow-ref doc:name="Flow Reference" doc:id="09ae0956-883e-4068-ac7c-a8906745528a" name="getUserIdSubscriptionId" />
+		<error-handler ref="commonErrorHandler" />
+    </flow>
+    <flow name="get:\user\(userId):mytrains-mysql-ws-config">
+        <ee:transform doc:name="Transform Message">
+            <ee:variables>
+                <ee:set-variable variableName="userId">attributes.uriParams.'userId'</ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+        <ee:transform doc:name="Transform Message">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+  USER_ID: "KBGF432",
+  EMAIL_ID: "kaberi2@gmail.com",
+  STATUS_TYPE_ID: 1,
+  FIRST_NAME: "kaberi",
+  LAST_NAME: "Dutta",
+  PHONE_NUMBER: 762991811,
+  CREATED_TIMESTAMP: "2024-11-07T04:38:13",
+  UPDATED_TIMESTAMP: "2024-11-07T04:38:13"
+} as Object {encoding: "UTF-8", mediaType: "application/json"}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+        <flow-ref doc:name="Flow Reference" doc:id="2bb827ab-b774-493c-ad0b-82ba11ff484a" name="getUserId" />
+		<error-handler ref="commonErrorHandler" />
+    </flow>
+    <flow name="post:\user\(userId)\subscription\(subscriptionId)\alert:application\json:mytrains-mysql-ws-config">
+        <!-- [STUDIO:"Transform Message"]<ee:transform doc:name="Transform Message">
+            <ee:variables>
+                <ee:set-variable variableName="userId">attributes.uriParams.'userId'</ee:set-variable>
+                <ee:set-variable variableName="subscriptionId">attributes.uriParams.'subscriptionId'</ee:set-variable>
+            </ee:variables>
+        </ee:transform> [STUDIO] -->
+        <!-- [STUDIO:"Transform Message"]<ee:transform doc:name="Transform Message">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+&#45;&#45;-
+{
+  message: "alert added but not really"
+} as Object {encoding: "UTF-8", mediaType: "application/json"}&#93;&#93;></ee:set-payload>
+            </ee:message>
+        </ee:transform> [STUDIO] -->
+        <flow-ref doc:name="Flow Reference" doc:id="9f07c0ac-05cc-4762-bc05-4f551332f048" name="postAlert" />
+		<error-handler ref="commonErrorHandler" />
+    </flow>
+    <flow name="post:\user\(userId)\subscription:application\json:mytrains-mysql-ws-config">
+        <!-- [STUDIO:"Transform Message"]<ee:transform doc:name="Transform Message">
+            <ee:variables>
+                <ee:set-variable variableName="userId">attributes.uriParams.'userId'</ee:set-variable>
+            </ee:variables>
+        </ee:transform> [STUDIO] -->
+        <!-- [STUDIO:"Transform Message"]<ee:transform doc:name="Transform Message">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+&#45;&#45;-
+{
+  message: "Subscription Added, Not really"
+} as Object {encoding: "UTF-8", mediaType: "application/json"}&#93;&#93;></ee:set-payload>
+            </ee:message>
+        </ee:transform> [STUDIO] -->
+        <flow-ref doc:name="Flow Reference" doc:id="70b3edf7-5b86-41bc-be8d-c5e7ce36bfc1" name="postSubscription" />
+		<error-handler ref="commonErrorHandler" />
+    </flow>
+    <flow name="post:\user:application\json:mytrains-mysql-ws-config">
+        <!-- [STUDIO:"Transform Message"]<ee:transform doc:name="Transform Message">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+&#45;&#45;-
+{
+  message: "User added but not really"
+} as Object {encoding: "UTF-8", mediaType: "application/json"}&#93;&#93;></ee:set-payload>
+            </ee:message>
+        </ee:transform> [STUDIO] -->
+        <flow-ref doc:name="Flow Reference" doc:id="1da61bee-066e-45d7-a192-8cb9b586a2af" name="postUser" />
+		<error-handler ref="commonErrorHandler" />
+    </flow>
+    <flow name="put:\AlertNotSendUpdate\(subscriptionId):mytrains-mysql-ws-config">
+        <!-- [STUDIO:"Transform Message"]<ee:transform doc:name="Transform Message">
+            <ee:variables>
+                <ee:set-variable variableName="subscriptionId">attributes.uriParams.'subscriptionId'</ee:set-variable>
+            </ee:variables>
+        </ee:transform> [STUDIO] -->
+        <!-- [STUDIO:"Transform Message"]<ee:transform doc:name="Transform Message">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+&#45;&#45;-
+"Updated successfully" as String {encoding: "UTF-8", mediaType: "application/json"}&#93;&#93;></ee:set-payload>
+            </ee:message>
+        </ee:transform> [STUDIO] -->
+        <flow-ref doc:name="Flow Reference" doc:id="338804ed-b212-486a-afc8-244407aacccf" name="UpdateAlertNotSendUpdate" />
+		<error-handler ref="commonErrorHandler" />
+    </flow>
+    <flow name="get:\alertSubscriptionNotSend:mytrains-mysql-ws-config">
+        <!-- [STUDIO:"Transform Message"]<ee:transform doc:name="Transform Message">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+&#45;&#45;-
+[
+  {
+    SUBSCRIPTION_ID: 1000032,
+    ALERT_TRANSACTION_ID: 125856857226,
+    EMAIL_ID: "itachi@gmail.com",
+    all_alerts: "No Additional Details",
+    FROM_TIME: "1970-01-01T18:20:00",
+    TO_TIME: "1970-01-01T20:00:00",
+    DELAY_TIME: 3
+  }, 
+  {
+    SUBSCRIPTION_ID: 1000039,
+    ALERT_TRANSACTION_ID: 125856857443,
+    EMAIL_ID: "ibinu@gmail.com",
+    all_alerts: "Train delayed due to rain",
+    FROM_TIME: "1970-01-01T18:20:00",
+    TO_TIME: "1970-01-01T20:00:00",
+    DELAY_TIME: 44
+  }
+&#93; as Array {encoding: "UTF-8", mediaType: "application/json"}&#93;&#93;></ee:set-payload>
+            </ee:message>
+        </ee:transform> [STUDIO] -->
+        <flow-ref doc:name="Flow Reference" doc:id="ef9238c0-d7bc-4a74-8b9e-b3701c8c561c" name="GetalertSubscriptionNotSend" />
+		<error-handler ref="commonErrorHandler" />
+    </flow>
+    <flow name="get:\SubscribedUserSalesforce:mytrains-mysql-ws-config">
+        <!-- [STUDIO:"Transform Message"]<ee:transform doc:name="Transform Message">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+&#45;&#45;-
+[
+  {
+    Name: "Nandakishore",
+    Phone: "5845747",
+    ID__c: "1000115",
+    Email__c: "raji0467@gmail.com"
+  }, 
+  {
+    Name: "DemoUser3user12",
+    Phone: "9876543210",
+    ID__c: "1000101",
+    Email__c: "demouser3@gmail.com"
+  }
+&#93; as Array {encoding: "UTF-8", mediaType: "application/json"}&#93;&#93;></ee:set-payload>
+            </ee:message>
+        </ee:transform> [STUDIO] -->
+		<flow-ref doc:name="Flow Reference" doc:id="25d31d20-c877-4019-bb7a-8136eaa12c6a" name="subscribedSalesforce"/>
+		<error-handler ref="commonErrorHandler" />
+    </flow>
+</mule>

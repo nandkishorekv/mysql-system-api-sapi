@@ -1,0 +1,307 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="getUser" doc:id="f4e64bdb-926f-45d2-b90d-7eb33a9ebb39" >
+		<!-- [STUDIO:"Listener"]<http:listener doc:name="Listener" doc:id="70df668a-704e-4c4b-baa5-6e54c7998097" config-ref="HTTP_Listener_config" path="/user" allowedMethods="GET"/> [STUDIO] -->
+		<db:select doc:name="Select" doc:id="4ef773bf-280b-4db7-937a-701eaa169691" config-ref="Database_Config">
+			<db:sql ><![CDATA[Select * FROM USER]]></db:sql>
+		</db:select>
+		<ee:transform doc:name="Transform Message" doc:id="45b6ab03-c53d-49c8-9922-e2342bdecb0f" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="4a423d59-c004-40f7-8901-7be2717b9b66" message="#[payload]"/>
+		<error-handler ref="commonErrorHandler" />
+	</flow>
+	<flow name="getUserId" doc:id="621761c4-7047-4960-8f52-8f473ef228af" >
+		<!-- [STUDIO:"Listener"]<http:listener doc:name="Listener" doc:id="dcf82f55-3bf2-4d5d-9593-b716e6e1e075" config-ref="HTTP_Listener_config" path="/user/{userId}" allowedMethods="GET" /> [STUDIO] -->
+		<db:select doc:name="Select" doc:id="852d5f0b-9779-47c5-baba-40779553ea48" config-ref="Database_Config">
+			<db:sql ><![CDATA[Select * FROM USER
+WHERE USER_ID = :USER_ID]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{
+	'USER_ID':attributes.uriParams.userId
+}]]]></db:input-parameters>
+		</db:select>
+		<ee:transform doc:name="Transform Message" doc:id="57b2f348-96c4-4a72-952a-7d6ccdcebc25" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="ade1630f-4c3d-48dc-9e73-5b20e3fff2ba" message="#[payload]"/>
+		<error-handler ref="commonErrorHandler" />
+	</flow>
+	<flow name="postUser" doc:id="094214ba-1b87-4103-91fb-953fd1d645b1" >
+		<!-- [STUDIO:"Listener"]<http:listener doc:name="Listener" doc:id="dd09e96d-12e4-475c-affc-93709d764d8d" config-ref="HTTP_Listener_config" path="/user" allowedMethods="POST"/> [STUDIO] -->
+		<db:insert doc:name="Insert" doc:id="cc6c2f1a-c6c8-4037-ba16-fdf1618110cd" config-ref="Database_Config">
+			<db:sql ><![CDATA[INSERT INTO USER(USER_ID, EMAIL_ID, STATUS_TYPE_ID, FIRST_NAME, LAST_NAME, PHONE_NUMBER)
+VALUES(:USER_ID, :EMAIL_ID, :STATUS_TYPE_ID, :FIRST_NAME, :LAST_NAME, :PHONE_NUMBER)]]></db:sql>
+			<db:input-parameters ><![CDATA[#[%dw 2.0
+output application/java
+---
+{
+	STATUS_TYPE_ID: payload.STATUS_TYPE_ID as String,
+	USER_ID: payload.USER_ID,
+	EMAIL_ID: payload.EMAIL_ID,
+	LAST_NAME: payload.LAST_NAME,
+	PHONE_NUMBER: payload.PHONE_NUMBER as String,
+	FIRST_NAME: payload.FIRST_NAME
+}]]]></db:input-parameters>
+		</db:insert>
+		<set-payload value='"user successfully added"' doc:name="Set Payload" doc:id="d8ba0f69-55bd-41b5-968e-7d3302ba05ee" />
+		<logger level="INFO" doc:name="Logger" doc:id="d283370b-0655-4d57-94d5-201178d50aaa" />
+		<error-handler ref="commonErrorHandler" />
+	</flow>
+	<flow name="getUserIdSubscription" doc:id="12335baf-b0b8-486c-be2d-0c3cae12ead2" >
+		<!-- [STUDIO:"Listener"]<http:listener doc:name="Listener" doc:id="72a1a7c1-991a-414f-b9e3-dc5ba5954fbb" config-ref="HTTP_Listener_config" path="/user/{userId}/subscription" allowedMethods="GET"/> [STUDIO] -->
+		<db:select doc:name="Select" doc:id="e05e19b8-3981-4bdf-a719-f2bc5eff34a9" config-ref="Database_Config">
+			<db:sql ><![CDATA[Select * FROM SUBSCRIPTION
+WHERE USER_ID = :USER_ID]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{
+	'USER_ID':attributes.uriParams.userId
+}]]]></db:input-parameters>
+		</db:select>
+		<ee:transform doc:name="Transform Message" doc:id="972c1a1b-4931-4338-98a8-418224b92a89" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="f38ff054-49e6-4ffe-ab02-c223330e18d7" message="#[payload]"/>
+		<error-handler ref="commonErrorHandler" />
+	</flow>
+	<flow name="getUserIdSubscriptionId" doc:id="2801ed6c-9768-4873-b2d0-822250bf3c9f" >
+		<!-- [STUDIO:"Listener"]<http:listener doc:name="Listener" doc:id="20cf2f30-458b-46e2-b3ac-dc787f94ebea" config-ref="HTTP_Listener_config" path="/user/{userId}/subscription/{subscriptionId}"/> [STUDIO] -->
+		<db:select doc:name="Select" doc:id="444bfffc-189a-479d-bdbf-8303ffdf514b" config-ref="Database_Config">
+			<db:sql ><![CDATA[Select * FROM SUBSCRIPTION
+WHERE USER_ID = :USER_ID 
+AND 
+SUBSCRIPTION_ID = :SUBSCRIPTION_ID]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{
+	'USER_ID':attributes.uriParams.userId,
+	'SUBSCRIPTION_ID': attributes.uriParams.subscriptionId
+}]]]></db:input-parameters>
+		</db:select>
+		<ee:transform doc:name="Transform Message" doc:id="5c12ab5e-49f7-47bb-be7e-bdc2c7563a1b" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="6ef431e1-036a-4b58-8387-9d2f00c9672b" message="#[payload]"/>
+		<error-handler ref="commonErrorHandler" />
+	</flow>
+	<flow name="postSubscription" doc:id="5038867e-25e9-4401-9918-80f1f980e357" >
+		<!-- [STUDIO:"Listener"]<http:listener doc:name="Listener" doc:id="104fffb6-c7e9-4ff8-a901-dfdefab717a4" config-ref="HTTP_Listener_config" path="/user/{userId}/subscription" allowedMethods="POST"/> [STUDIO] -->
+		<db:insert doc:name="Insert" doc:id="4e914391-1356-4056-a497-83d7572ae98e" config-ref="Database_Config">
+			<db:sql ><![CDATA[INSERT INTO SUBSCRIPTION(USER_ID, STATUS_TYPE_ID, SOURCE_LOCATION, DESTINATION_LOCATION, FROM_TIME, TO_TIME, ADVANCE_NOTIFY_TIME_MIN)
+VALUES(:USER_ID, :STATUS_TYPE_ID, :SOURCE_LOCATION, :DESTINATION_LOCATION, :FROM_TIME, :TO_TIME, :ADVANCE_NOTIFY_TIME_MIN)]]></db:sql>
+			<db:input-parameters ><![CDATA[#[%dw 2.0
+output application/java
+---
+{
+	ADVANCE_NOTIFY_TIME_MIN: payload.ADVANCE_NOTIFY_TIME_MIN as String,
+	STATUS_TYPE_ID: payload.STATUS_TYPE_ID as String,
+	SOURCE_LOCATION: payload.SOURCE_LOCATION,
+	FROM_TIME: payload.FROM_TIME,
+	'USER_ID': attributes.uriParams.userId,
+	TO_TIME: payload.TO_TIME,
+	DESTINATION_LOCATION: payload.DESTINATION_LOCATION
+}]]]></db:input-parameters>
+		</db:insert>
+		<set-payload value='"Subscription added succesfully"' doc:name="Set Payload" doc:id="a27d6d3a-3024-49a4-976d-0ef63cc9d919" />
+		<logger level="INFO" doc:name="Logger" doc:id="e8ce1b98-5d26-48e3-9671-f863167105bc" message="#[payload]"/>
+		<error-handler ref="commonErrorHandler" />
+	</flow>
+	<flow name="getAlertsBySubscriptionId" doc:id="282f03ad-8c76-40ea-a2d5-b00629aee4f7" >
+		<!-- [STUDIO:"Listener"]<http:listener doc:name="Listener" doc:id="1ceac5dc-cf01-4438-82ec-4622a03e8046" config-ref="HTTP_Listener_config" path="/user/{userId}/subscription/{subscriptionId}/alert" allowedMethods="GET"/> [STUDIO] -->
+		<db:select doc:name="Select" doc:id="05566155-9bfe-4cbf-a4a7-419587885b6a" config-ref="Database_Config">
+			<db:sql ><![CDATA[Select * FROM ALERT
+WHERE
+SUBSCRIPTION_ID = :SUBSCRIPTION_ID]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{
+	'USER_ID':attributes.uriParams.userId,
+	'SUBSCRIPTION_ID': attributes.uriParams.subscriptionId
+}]]]></db:input-parameters>
+		</db:select>
+		<ee:transform doc:name="Transform Message" doc:id="2bb75c70-4522-4fba-ac62-3f1f3f21e1fb" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="7576f4dc-0c5a-41ee-b711-8de11388c243" message="#[payload]"/>
+		<error-handler ref="commonErrorHandler" />
+	</flow>
+	<flow name="getAlertByAlertId" doc:id="5913b468-e454-4067-95c9-8b1640657a66" >
+		<!-- [STUDIO:"Listener"]<http:listener doc:name="Listener" doc:id="58063805-c82e-4b92-acdd-d01c88b0f2c7" config-ref="HTTP_Listener_config" path="/user/{userId}/subscription/{subscriptionId}/alert/{alertId}"/> [STUDIO] -->
+		<db:select doc:name="Select" doc:id="620ca724-4188-41ad-a486-1f1c694a8c69" config-ref="Database_Config">
+			<db:sql ><![CDATA[Select * FROM ALERT
+WHERE
+SUBSCRIPTION_ID = :SUBSCRIPTION_ID
+AND
+ALERT_TRANSACTION_ID = :ALERT_TRANSACTION_ID]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{
+	'USER_ID': attributes.uriParams.userId,
+	'SUBSCRIPTION_ID': attributes.uriParams.subscriptionId,
+	'ALERT_TRANSACTION_ID': attributes.uriParams.alertId
+}]]]></db:input-parameters>
+		</db:select>
+		<ee:transform doc:name="Transform Message" doc:id="51eb8a26-7437-4944-bed0-e1ffd69c57b5" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="09f468a9-8d89-46b9-87e3-e76d51034679" message="#[payload]"/>
+		<error-handler ref="commonErrorHandler" />
+	</flow>
+	<flow name="getSubscriptionByAlertTime" doc:id="1a9e3ae6-3435-4571-8528-d504c2350beb" >
+		<!-- [STUDIO:"Listener"]<http:listener doc:name="Listener" doc:id="ba20175e-9651-43f0-b595-6f1d66677a5b" config-ref="HTTP_Listener_config" path="/subscriptionByAlertTime" allowedMethods="GET"/> [STUDIO] -->
+		<db:select doc:name="Select" doc:id="d4dcb8c2-757e-4bec-b467-363b23dbe9fb" config-ref="Database_Config">
+			<db:sql ><![CDATA[SELECT * 
+FROM nrs.SUBSCRIPTION
+WHERE FROM_TIME BETWEEN NOW() AND NOW() + INTERVAL 2 HOUR]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{
+	'FROM_TIME': attributes.queryParams.FROM_TIME,
+	'TO_TIME': attributes.queryParams.TO_TIME
+}]]]></db:input-parameters>
+		</db:select>
+		<ee:transform doc:name="Transform Message" doc:id="5522cf3d-d5ba-4763-9d72-15c3c53bab33" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="37f47c22-2e65-4ea6-96db-e50b6d4fcc37" message="#[payload]"/>
+		<error-handler ref="commonErrorHandler" />
+	</flow>
+	<flow name="postAlert" doc:id="60f54d6d-a56f-45fe-b3db-c5ba3ce7b36a" >
+		<!-- [STUDIO:"Listener"]<http:listener doc:name="Listener" doc:id="0010af41-68dc-4b5d-b94b-71f43d530657" config-ref="HTTP_Listener_config" path="/user/{userId}/subscription/{subscriptionId}/alert" allowedMethods="POST"/> [STUDIO] -->
+		<db:insert doc:name="Insert" doc:id="37c539b7-aaed-47f7-aae7-5b42d97c9b22" config-ref="Database_Config">
+			<db:sql ><![CDATA[INSERT INTO ALERT(SUBSCRIPTION_ID, DELAY_TYPE_FLAG, NOTIFICATION_STATUS, NOTIFICATION_FAILURE_DETAIL, DELAY_TIME)
+VALUES(:SUBSCRIPTION_ID, :DELAY_TYPE_FLAG, :NOTIFICATION_STATUS, :NOTIFICATION_FAILURE_DETAIL, :DELAY_TIME)]]></db:sql>
+			<db:input-parameters ><![CDATA[#[%dw 2.0
+output application/java
+---
+{
+	NOTIFICATION_FAILURE_DETAIL: payload.NOTIFICATION_FAILURE_DETAIL,
+	'SUBSCRIPTION_ID': attributes.uriParams.subscriptionId,
+	DELAY_TYPE_FLAG: payload.DELAY_TYPE_FLAG,
+	DELAY_TIME: payload.DELAY_TIME as String,
+	NOTIFICATION_STATUS: payload.NOTIFICATION_STATUS
+}]]]></db:input-parameters>
+		</db:insert>
+		<set-payload value="alert added" doc:name="Set Payload" doc:id="9c5acea6-0f47-41ae-bd33-bf72df665592" />
+		<logger level="INFO" doc:name="Logger" doc:id="89ffbd10-c21f-4353-84d7-c7cec3e7bf16" message="#[payload]"/>
+		<error-handler ref="commonErrorHandler" />
+	</flow>
+	<flow name="GetalertSubscriptionNotSend" doc:id="aa8318be-83dd-4164-b72a-2619d85fbca6" >
+		<db:select doc:name="Select" doc:id="cf1e8f8a-e69d-4efa-8903-a0791063d8bf" config-ref="Database_Config">
+			<db:sql ><![CDATA[SELECT a.SUBSCRIPTION_ID,
+       u.EMAIL_ID,
+       GROUP_CONCAT(a.NOTIFICATION_FAILURE_DETAIL SEPARATOR '\n') AS all_alerts,
+       GROUP_CONCAT(a.DELAY_TIME SEPARATOR '\n') AS all_delay,
+       s.FROM_TIME,
+       s.TO_TIME
+FROM ALERT a
+JOIN SUBSCRIPTION s ON a.SUBSCRIPTION_ID = s.SUBSCRIPTION_ID
+JOIN USER u ON s.USER_ID = u.USER_ID
+WHERE a.NOTIFICATION_STATUS = 'Not Yet Send'
+  AND s.FROM_TIME BETWEEN NOW() AND NOW() + INTERVAL 2 HOUR
+GROUP BY a.SUBSCRIPTION_ID, u.EMAIL_ID, s.FROM_TIME, s.TO_TIME;
+]]></db:sql>
+		</db:select>
+		<ee:transform doc:name="Transform Message" doc:id="7db1af64-bc87-422e-8955-a0ac52226187" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="7d832dcf-9531-414d-aa2a-4f4c005aec0c" message="#[payload]"/>
+		<error-handler ref="commonErrorHandler" />
+	</flow>
+	<flow name="subscribedSalesforce" doc:id="5d570e88-a0ed-4e57-b756-7383d916be53" >
+		<db:select doc:name="Select" doc:id="606cf55c-632f-45bb-bc65-23fd0d326e32" config-ref="Database_Config">
+			<db:sql ><![CDATA[SELECT u.USER_ID, u.EMAIL_ID, u.FIRST_NAME, u.LAST_NAME, u.PHONE_NUMBER, s.SUBSCRIPTION_ID
+FROM SUBSCRIPTION s
+JOIN USER u ON u.USER_ID = s.USER_ID
+WHERE s.STATUS_TYPE_ID = "1";]]></db:sql>
+		</db:select>
+		<!-- [STUDIO:"Transform Message"]<ee:transform doc:name="Transform Message" doc:id="3e6f1a01-8be5-482b-9f2b-fcf36909fae2" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+&#45;&#45;-
+payload&#93;&#93;></ee:set-payload>
+			</ee:message>
+		</ee:transform> [STUDIO] -->
+		<ee:transform doc:name="Transform Message" doc:id="40d1f8fc-0208-48b5-93b5-becf29f6fe61" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload map (item,index) -> {
+	Name: (item.FIRST_NAME default "") ++ item.LAST_NAME,
+	Phone: item.PHONE_NUMBER,
+	ID__c: item.SUBSCRIPTION_ID as String,
+	Email__c: item.EMAIL_ID
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<error-handler ref="commonErrorHandler" />
+	</flow>
+	<flow name="UpdateAlertNotSendUpdate" doc:id="2d722584-d225-412e-a5a8-06cca5be4a72" >
+		<db:update doc:name="UpdateAlertNotSendUpdate" doc:id="218f11ec-bf33-447b-bf72-07ac43395ca9" config-ref="Database_Config">
+			<db:sql ><![CDATA[UPDATE ALERT
+SET NOTIFICATION_STATUS = 'SENT'
+WHERE SUBSCRIPTION_ID = :SUBSCRIPTION_ID 
+  AND NOTIFICATION_STATUS = 'Not Yet Send';]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{
+	'SUBSCRIPTION_ID': attributes.uriParams.subscriptionId
+}]]]></db:input-parameters>
+		</db:update>
+		<set-payload value='"user updated"' doc:name="Set Payload" doc:id="eb7fc23d-a792-4c7c-a258-f56843b2639f" />
+		<logger level="INFO" doc:name="Logger" doc:id="44e6132a-20f4-4b95-804b-1538d43a9973" message="updated successfully"/>
+		<error-handler ref="commonErrorHandler" />
+	</flow>
+	<flow name="getHealth" doc:id="e308c7a5-06b9-49b8-9eb7-9efeacaa6366" >
+		<ee:transform doc:name="Transform Message" doc:id="6ec7f326-7ecd-4c2f-b121-b2c56cccd0db" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+
+apiName: app.name,
+timestamp: now()
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="de4b2983-7dcd-4c8e-9cab-c19e60af4287" message="#[payload]"/>
+		<error-handler ref="commonErrorHandler" />
+	</flow>
+</mule>

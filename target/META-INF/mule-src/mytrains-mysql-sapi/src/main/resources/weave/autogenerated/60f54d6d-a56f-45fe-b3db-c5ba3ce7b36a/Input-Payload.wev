@@ -1,0 +1,13 @@
+%dw 2.0
+
+type auto_60f54d6d_a56f_45fe_b3db_c5ba3ce7b36a_Input_Payload = {
+  NOTIFICATION_FAILURE_DETAIL: String | Null, 
+  CREATION_TIMESTAMP?: String | Null, 
+  SUBSCRIPTION_ID?: Number, 
+  DELAY_TYPE_FLAG: String, 
+  DELAY_TIME?: Number | Null, 
+  NOTIFICATION_STATUS: String | Null, 
+  ALERT_TRANSACTION_ID?: Number, 
+  _?: Any
+}
+

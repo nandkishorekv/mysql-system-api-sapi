@@ -1,0 +1,14 @@
+%dw 2.0
+
+type auto_621761c4_7047_4960_8f52_8f473ef228af_Output_Payload = {
+  STATUS_TYPE_ID: Number, 
+  UPDATED_TIMESTAMP?: String | Null, 
+  USER_ID: String, 
+  EMAIL_ID: String, 
+  LAST_NAME: String, 
+  PHONE_NUMBER: Number, 
+  CREATED_TIMESTAMP?: String | Null, 
+  FIRST_NAME: String, 
+  _?: Any
+}
+

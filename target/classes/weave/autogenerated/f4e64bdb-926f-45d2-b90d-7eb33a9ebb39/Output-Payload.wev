@@ -1,0 +1,4 @@
+%dw 2.0
+
+type auto_f4e64bdb_926f_45d2_b90d_7eb33a9ebb39_Output_Payload = Array<{  STATUS_TYPE_ID: Number,   UPDATED_TIMESTAMP?: String | Null,   USER_ID: String,   EMAIL_ID: String,   LAST_NAME: String,   PHONE_NUMBER: Number,   CREATED_TIMESTAMP?: String | Null,   FIRST_NAME: String,   _?: Any}>
+

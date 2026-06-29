@@ -1,0 +1,8 @@
+{
+    "STATUS_TYPE_ID": 1,
+    "SOURCE_LOCATION": "JFK",
+    "DESTINATION_LOCATION": "PAD",
+    "FROM_TIME": "01:12:00",
+    "TO_TIME": "02:12:00",
+    "ADVANCE_NOTIFY_TIME_MIN": 33
+}

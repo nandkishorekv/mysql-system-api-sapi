@@ -1,0 +1,16 @@
+%dw 2.0
+
+type auto_2801ed6c_9768_4873_b2d0_822250bf3c9f_Input_Payload = {|
+  SUBSCRIPTION_ID: Number, 
+  USER_ID: String, 
+  STATUS_TYPE_ID: Number, 
+  SOURCE_LOCATION: String, 
+  DESTINATION_LOCATION: String, 
+  FROM_TIME: String, 
+  TO_TIME: String, 
+  ADVANCE_NOTIFY_TIME_MIN: Number, 
+  CREATION_TIMESTAMP: String, 
+  UPDATED_TIMESTAMP: String
+|} {"mediaType": "application/json",
+"encoding": "UTF-8"}
+

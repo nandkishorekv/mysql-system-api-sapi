@@ -1,0 +1,14 @@
+%dw 2.0
+
+type auto_621761c4_7047_4960_8f52_8f473ef228af_Input_Payload = {|
+  USER_ID: String, 
+  EMAIL_ID: String, 
+  STATUS_TYPE_ID: Number, 
+  FIRST_NAME: String, 
+  LAST_NAME: String, 
+  PHONE_NUMBER: Number, 
+  CREATED_TIMESTAMP: String, 
+  UPDATED_TIMESTAMP: String
+|} {"mediaType": "application/json",
+"encoding": "UTF-8"}
+

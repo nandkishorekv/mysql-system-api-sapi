@@ -1,0 +1,30 @@
+%dw 2.0
+
+type auto_60f54d6d_a56f_45fe_b3db_c5ba3ce7b36a_Input_Attributes = {|
+  clientCertificate?: {|
+    publicKey?: {|  |}, 
+    "type"?: String, 
+    encoded?: Binary
+  |}, 
+  headers: {|
+    "X-CLIENT-ID": String, 
+    "X-CLIENT-SECRET": String, 
+    "X-CORRELATION-ID"?: String
+  |}, 
+  listenerPath: String, 
+  method: String, 
+  queryParams: {|  |}, 
+  queryString: String, 
+  relativePath: String, 
+  remoteAddress: String, 
+  requestPath: String, 
+  requestUri: String, 
+  scheme: String, 
+  uriParams: {|
+    userId: String, 
+    subscriptionId: String
+  |}, 
+  version: String, 
+  localAddress: String
+|}
+

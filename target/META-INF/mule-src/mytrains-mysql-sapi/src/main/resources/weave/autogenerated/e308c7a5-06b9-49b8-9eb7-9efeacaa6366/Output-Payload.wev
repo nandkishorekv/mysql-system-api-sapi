@@ -1,0 +1,10 @@
+%dw 2.0
+
+type auto_e308c7a5_06b9_49b8_9eb7_9efeacaa6366_Output_Payload = {
+  apiName: String, 
+  apiVersion: String, 
+  status: String, 
+  timestamp: String, 
+  _?: Any
+}
+

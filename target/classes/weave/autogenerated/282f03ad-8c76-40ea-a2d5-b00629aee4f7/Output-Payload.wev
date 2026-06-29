@@ -1,0 +1,4 @@
+%dw 2.0
+
+type auto_282f03ad_8c76_40ea_a2d5_b00629aee4f7_Output_Payload = Array<{  NOTIFICATION_FAILURE_DETAIL: String | Null,   CREATION_TIMESTAMP?: String | Null,   SUBSCRIPTION_ID?: Number,   DELAY_TYPE_FLAG: String,   DELAY_TIME?: Number | Null,   NOTIFICATION_STATUS: String | Null,   ALERT_TRANSACTION_ID?: Number,   _?: Any}>
+

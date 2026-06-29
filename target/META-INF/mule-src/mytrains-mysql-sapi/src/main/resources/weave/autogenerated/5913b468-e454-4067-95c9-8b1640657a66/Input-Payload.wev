@@ -1,0 +1,13 @@
+%dw 2.0
+
+type auto_5913b468_e454_4067_95c9_8b1640657a66_Input_Payload = {|
+  ALERT_TRANSACTION_ID: Number, 
+  SUBSCRIPTION_ID: Number, 
+  DELAY_TYPE_FLAG: String, 
+  NOTIFICATION_STATUS: String, 
+  NOTIFICATION_FAILURE_DETAIL: String, 
+  DELAY_TIME: Number, 
+  CREATION_TIMESTAMP: String
+|} {"mediaType": "application/json",
+"encoding": "UTF-8"}
+

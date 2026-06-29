@@ -1,0 +1,16 @@
+%dw 2.0
+
+type auto_2801ed6c_9768_4873_b2d0_822250bf3c9f_Output_Payload = {
+  ADVANCE_NOTIFY_TIME_MIN: Number, 
+  STATUS_TYPE_ID: Number, 
+  SOURCE_LOCATION: String, 
+  CREATION_TIMESTAMP?: String | Null, 
+  UPDATED_TIMESTAMP?: String | Null, 
+  SUBSCRIPTION_ID?: Number, 
+  FROM_TIME: String, 
+  USER_ID?: String, 
+  TO_TIME: String, 
+  DESTINATION_LOCATION: String, 
+  _?: Any
+}
+

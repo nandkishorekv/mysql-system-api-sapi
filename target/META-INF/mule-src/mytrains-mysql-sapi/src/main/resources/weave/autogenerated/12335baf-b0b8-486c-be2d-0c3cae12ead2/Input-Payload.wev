@@ -1,0 +1,5 @@
+%dw 2.0
+
+type auto_12335baf_b0b8_486c_be2d_0c3cae12ead2_Input_Payload = Array<{|  SUBSCRIPTION_ID: Number,   USER_ID: String,   STATUS_TYPE_ID: Number,   SOURCE_LOCATION: String,   DESTINATION_LOCATION: String,   FROM_TIME: String,   TO_TIME: String,   ADVANCE_NOTIFY_TIME_MIN: Number,   CREATION_TIMESTAMP: String,   UPDATED_TIMESTAMP: String|}> {"mediaType": "application/json",
+"encoding": "UTF-8"}
+
