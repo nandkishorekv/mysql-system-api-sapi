@@ -1,8 +1,9 @@
 {
   "minMuleVersion": "4.4.0",
   "secureProperties": [
-    "mq.clientId",
-    "mq.clientSecret",
-    "azureKeyVault.accessToken"
+    "tls.keystore.password",
+    "tls.keystore.keyPassword",
+    "salesforce.clientId",
+    "salesforce.clientSecret"
   ]
 }

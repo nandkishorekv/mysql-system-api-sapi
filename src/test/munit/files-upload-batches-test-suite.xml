@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:munit="http://www.mulesoft.org/schema/mule/munit" 
+	xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+	xmlns="http://www.mulesoft.org/schema/mule/core" 
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+
+	<munit:config name="files-upload-batches-test-suite.xml" />
+
+	<munit:before-suite name="files-upload-batches-before-suite" doc:id="7055f00e-c472-4218-891d-6c4f427d49a9">
+		<munit-tools:store key="test.environment" doc:id="f57dda0e-fd99-4996-91bc-a603d49f1e32">
+			<munit-tools:value>#["test"]</munit-tools:value>
+		</munit-tools:store>
+		<logger level="INFO" doc:id="e1e7fe45-8fb6-4c97-a502-17e558c86d90"
+		        message="Starting files-upload-batches Test Suite"/>
+	</munit:before-suite>
+
+	<munit:test name="post-files-upload-batch-flowTest"
+	            doc:id="dacf5b00-19b9-43bb-b345-1a74ee9830cd"
+	            description="Test post-files-upload-batch-flow - send-message">
+		<munit:behavior>
+			<munit-tools:mock-when doc:name="Mock http:request"
+			                        doc:id="3ea39a7b-9a83-42a3-b04e-8d9f5baa59b9"
+			                        processor="http:request">
+				<munit-tools:with-attributes>
+					<munit-tools:with-attribute whereValue="doc-b09b1a72" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return>
+					<munit-tools:payload value='#[output application/json --- {"id":1,"success":true}]'
+					                      mediaType="application/json"
+					                      encoding="UTF-8"/>
+					<munit-tools:attributes value='#[{headers: {authorization: "Bearer test-jwt-token-12345678901234567890", "x-correlation-id": "test-correlation-id-12345"}}]' />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock http:request"
+			                        doc:id="6ebef7ff-4e2c-4094-a2af-59b77c235550"
+			                        processor="http:request">
+				<munit-tools:with-attributes>
+					<munit-tools:with-attribute whereValue="doc-2fc6874a" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return>
+					<munit-tools:payload value='#[output application/json --- {"id":1,"success":true}]'
+					                      mediaType="application/json"
+					                      encoding="UTF-8"/>
+					<munit-tools:attributes value='#[{headers: {authorization: "Bearer test-jwt-token-12345678901234567890", "x-correlation-id": "test-correlation-id-12345"}}]' />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock http:request"
+			                        doc:id="53cb0f3f-255e-48d5-85c1-9954b1dca5ca"
+			                        processor="http:request">
+				<munit-tools:with-attributes>
+					<munit-tools:with-attribute whereValue="doc-26a699aa" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return>
+					<munit-tools:payload value='#[output application/json --- {"id":1,"success":true}]'
+					                      mediaType="application/json"
+					                      encoding="UTF-8"/>
+					<munit-tools:attributes value='#[{headers: {authorization: "Bearer test-jwt-token-12345678901234567890", "x-correlation-id": "test-correlation-id-12345"}}]' />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock http:request"
+			                        doc:id="ec3985d7-4ac4-43aa-b317-b9248ce501cb"
+			                        processor="http:request">
+				<munit-tools:with-attributes>
+					<munit-tools:with-attribute whereValue="doc-021b64cc" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return>
+					<munit-tools:payload value='#[output application/json --- {"id":1,"success":true}]'
+					                      mediaType="application/json"
+					                      encoding="UTF-8"/>
+					<munit-tools:attributes value='#[{headers: {authorization: "Bearer test-jwt-token-12345678901234567890", "x-correlation-id": "test-correlation-id-12345"}}]' />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock http:request"
+			                        doc:id="d96995b7-6829-445b-b7d8-b1eda09db287"
+			                        processor="http:request">
+				<munit-tools:with-attributes>
+					<munit-tools:with-attribute whereValue="doc-6810ab82" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return>
+					<munit-tools:payload value='#[output application/json --- {"id":1,"success":true}]'
+					                      mediaType="application/json"
+					                      encoding="UTF-8"/>
+					<munit-tools:attributes value='#[{headers: {authorization: "Bearer test-jwt-token-12345678901234567890", "x-correlation-id": "test-correlation-id-12345"}}]' />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock sqs:send-message"
+			                        doc:id="393b4dee-cffd-48ed-8895-0a50fd6c6119"
+			                        processor="sqs:send-message">
+				<munit-tools:with-attributes>
+					<munit-tools:with-attribute whereValue="doc-4e55bd18" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return>
+					<munit-tools:payload value='#[output application/json --- {"id":1,"success":true}]'
+					                      mediaType="application/json"
+					                      encoding="UTF-8"/>
+					<munit-tools:attributes value='#[{headers: {authorization: "Bearer test-jwt-token-12345678901234567890", "x-correlation-id": "test-correlation-id-12345"}}]' />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock process-info-logger-sub-flow" doc:id="5cf62b74-7245-4743-a6f2-7febcfcf4a30" processor="flow-ref">
+				<munit-tools:with-attributes>
+					<munit-tools:with-attribute whereValue="process-info-logger-sub-flow" attributeName="name"/>
+				</munit-tools:with-attributes>
+				<munit-tools:then-return>
+					<munit-tools:payload value='#[payload]' mediaType="application/json" encoding="UTF-8"/>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock process-info-logger-sub-flow" doc:id="e8fd8ab3-92c9-41e6-a36a-e8e5633e97c9" processor="flow-ref">
+				<munit-tools:with-attributes>
+					<munit-tools:with-attribute whereValue="process-info-logger-sub-flow" attributeName="name"/>
+				</munit-tools:with-attributes>
+				<munit-tools:then-return>
+					<munit-tools:payload value='#[payload]' mediaType="application/json" encoding="UTF-8"/>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock validate-upload-batch-request-sub-flow" doc:id="29561e32-4dbf-4545-8a99-fac83483de90" processor="flow-ref">
+				<munit-tools:with-attributes>
+					<munit-tools:with-attribute whereValue="validate-upload-batch-request-sub-flow" attributeName="name"/>
+				</munit-tools:with-attributes>
+				<munit-tools:then-return>
+					<munit-tools:payload value='#[payload]' mediaType="application/json" encoding="UTF-8"/>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock get-salesforce-access-token-sub-flow" doc:id="da7c5edb-7c2b-4f26-b1fe-bd688dabb225" processor="flow-ref">
+				<munit-tools:with-attributes>
+					<munit-tools:with-attribute whereValue="get-salesforce-access-token-sub-flow" attributeName="name"/>
+				</munit-tools:with-attributes>
+				<munit-tools:then-return>
+					<munit-tools:payload value='#[payload]' mediaType="application/json" encoding="UTF-8"/>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock process-info-logger-sub-flow" doc:id="90ae1067-07d3-4750-84af-36f7f362ce22" processor="flow-ref">
+				<munit-tools:with-attributes>
+					<munit-tools:with-attribute whereValue="process-info-logger-sub-flow" attributeName="name"/>
+				</munit-tools:with-attributes>
+				<munit-tools:then-return>
+					<munit-tools:payload value='#[payload]' mediaType="application/json" encoding="UTF-8"/>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock process-info-logger-sub-flow" doc:id="fd917bfe-2880-4e1a-a44f-a0455aab8ddd" processor="flow-ref">
+				<munit-tools:with-attributes>
+					<munit-tools:with-attribute whereValue="process-info-logger-sub-flow" attributeName="name"/>
+				</munit-tools:with-attributes>
+				<munit-tools:then-return>
+					<munit-tools:payload value='#[payload]' mediaType="application/json" encoding="UTF-8"/>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock process-info-logger-sub-flow" doc:id="94d11dac-1d4b-4279-b0f2-1f7c8c3ad9b1" processor="flow-ref">
+				<munit-tools:with-attributes>
+					<munit-tools:with-attribute whereValue="process-info-logger-sub-flow" attributeName="name"/>
+				</munit-tools:with-attributes>
+				<munit-tools:then-return>
+					<munit-tools:payload value='#[payload]' mediaType="application/json" encoding="UTF-8"/>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock process-info-logger-sub-flow" doc:id="a037b9f4-3a27-4596-9228-bc7ab014fecc" processor="flow-ref">
+				<munit-tools:with-attributes>
+					<munit-tools:with-attribute whereValue="process-info-logger-sub-flow" attributeName="name"/>
+				</munit-tools:with-attributes>
+				<munit-tools:then-return>
+					<munit-tools:payload value='#[payload]' mediaType="application/json" encoding="UTF-8"/>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock process-info-logger-sub-flow" doc:id="4c3d74c7-3902-4bca-a0c6-050a602c3775" processor="flow-ref">
+				<munit-tools:with-attributes>
+					<munit-tools:with-attribute whereValue="process-info-logger-sub-flow" attributeName="name"/>
+				</munit-tools:with-attributes>
+				<munit-tools:then-return>
+					<munit-tools:payload value='#[payload]' mediaType="application/json" encoding="UTF-8"/>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock process-info-logger-sub-flow" doc:id="42c9a7b4-3fac-45cb-91ef-a0cf24c5d73f" processor="flow-ref">
+				<munit-tools:with-attributes>
+					<munit-tools:with-attribute whereValue="process-info-logger-sub-flow" attributeName="name"/>
+				</munit-tools:with-attributes>
+				<munit-tools:then-return>
+					<munit-tools:payload value='#[payload]' mediaType="application/json" encoding="UTF-8"/>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock process-info-logger-sub-flow" doc:id="d8f8369d-b58b-40f3-a8a6-f5cdceefc8b4" processor="flow-ref">
+				<munit-tools:with-attributes>
+					<munit-tools:with-attribute whereValue="process-info-logger-sub-flow" attributeName="name"/>
+				</munit-tools:with-attributes>
+				<munit-tools:then-return>
+					<munit-tools:payload value='#[payload]' mediaType="application/json" encoding="UTF-8"/>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock process-info-logger-sub-flow" doc:id="6c18bf48-6b5c-4382-9dad-aa4269dd140c" processor="flow-ref">
+				<munit-tools:with-attributes>
+					<munit-tools:with-attribute whereValue="process-info-logger-sub-flow" attributeName="name"/>
+				</munit-tools:with-attributes>
+				<munit-tools:then-return>
+					<munit-tools:payload value='#[payload]' mediaType="application/json" encoding="UTF-8"/>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+
+		<munit:execution>
+			<!-- Setup Mule event with payload and attributes and variables -->
+			<munit:set-event doc:name="Set Event" doc:id="7e931428-d1ce-4435-beb0-72269b95fc66">
+				<munit:payload value='#[output application/json --- {
+  "id": 1,
+  "name": "Test file",
+  "description": "Auto-generated test file",
+  "status": "active",
+  "code": "TEST-FILE-001",
+  "type": "file",
+  "createdDate": "2025-01-15T10:00:00Z",
+  "createdBy": "test-user",
+  "isActive": true
+}]' mediaType="application/json" encoding="UTF-8" />
+				<munit:attributes value='#[{headers: {authorization: "Bearer test-jwt-token-12345678901234567890", "x-correlation-id": "test-correlation-id-12345"}}]' />
+				<munit:variables>
+					<munit:variable key="rawToken" value='#["test-rawToken"]' />
+					<munit:variable key="correlationId" value='#[1]' />
+					<munit:variable key="numberOfFilesSent" value='#["test-numberOfFilesSent"]' />
+					<munit:variable key="numberOfFilesSuccessfullyUploaded" value='#["test-numberOfFilesSuccessfullyUploaded"]' />
+					<munit:variable key="numberOfFilesUpserted" value='#["test-numberOfFilesUpserted"]' />
+					<munit:variable key="numberOfFilesUploadedToKnowledge" value='#["test-numberOfFilesUploadedToKnowledge"]' />
+					<munit:variable key="filesUploadedAndUpserted" value='#[output application/java --- []]' />
+					<munit:variable key="fileErrors" value='#[output application/java --- []]' />
+					<munit:variable key="originalFiles" value='#["test-originalFiles"]' />
+					<munit:variable key="currentFile" value='#["test-currentFile"]' />
+					<munit:variable key="currentFileName" value='#["Test Name"]' />
+					<munit:variable key="contentVersionQueryResult" value='#["test-contentVersionQueryResult"]' />
+					<munit:variable key="salesforceAccessToken" value='#["test-salesforceAccessToken"]' />
+					<munit:variable key="existingContentDocumentId" value='#[1]' />
+					<munit:variable key="existingContentVersionId" value='#[1]' />
+					<munit:variable key="upsertResult" value='#["test-upsertResult"]' />
+					<munit:variable key="createContentVersionResult" value='#["test-createContentVersionResult"]' />
+					<munit:variable key="newContentVersionId" value='#[1]' />
+					<munit:variable key="newContentDocIdQueryResult" value='#["test-newContentDocIdQueryResult"]' />
+					<munit:variable key="newContentDocumentId" value='#[1]' />
+					<munit:variable key="compositeResult" value='#["test-compositeResult"]' />
+					<munit:variable key="httpStatus" value='#[200]' />
+					<munit:variable key="outboundHeaders" value='#[output application/java --- {}]' />
+				</munit:variables>
+			</munit:set-event>
+
+			<flow-ref doc:name="Flow-ref to post-files-upload-batch-flow"
+			          doc:id="d5ed43f7-245a-4143-9106-968cb82af9b6"
+			          name="post-files-upload-batch-flow"/>
+		</munit:execution>
+
+		<munit:validation>
+			<munit-tools:assert-that doc:name="Assert payload not null"
+			                          doc:id="247e3e49-fcf9-4a43-8492-259083fb81d4"
+			                          expression="#[payload]"
+			                          is="#[MunitTools::notNullValue()]"/>
+
+			<logger level="INFO" doc:id="9a3a7264-09f9-4b35-897c-e8f60e64db49"
+			        message="#['Test payload: ' ++ write(payload, 'application/json')]"/>
+		</munit:validation>
+	</munit:test>
+
+
+	<munit:after-suite name="files-upload-batches-after-suite" doc:id="b6b85909-653d-4c0f-bc0c-ab5b5773c547">
+		<logger level="INFO" doc:id="39e0f6cf-1816-470e-bba1-88375ff169ca"
+		        message="files-upload-batches Test Suite completed successfully"/>
+	</munit:after-suite>
+
+</mule>

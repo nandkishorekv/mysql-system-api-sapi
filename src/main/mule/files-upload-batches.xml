@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+      xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:sqs="http://www.mulesoft.org/schema/mule/sqs"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+  <flow name="post-files-upload-batch-flow" doc:id="doc-3889d6b1">
+    <ee:transform doc:name="Verify Bearer Token" doc:id="doc-8c013e8c">
+      <ee:variables doc:id="doc-78fc6f59">
+        <ee:set-variable variableName="rawToken" doc:id="doc-514940b8">
+          #[((attributes.headers.authorization default '') replace 'Bearer ' with '')]
+        </ee:set-variable>
+      </ee:variables>
+    </ee:transform>
+    <choice doc:name="Bearer Token Present?" doc:id="doc-1189d7ca">
+      <when expression="#[vars.rawToken == '']" doc:id="doc-ee41e9d6">
+        <raise-error type="APP:UNAUTHORIZED" description="OAuth2 token validation failed" doc:id="doc-e0b4f45c" />
+      </when>
+      <otherwise doc:id="doc-edc88775">
+        <flow-ref name="process-info-logger-sub-flow" doc:name="Call process-info-logger-sub-flow (Logger)" doc:id="doc-l4xixbd9" />
+      </otherwise>
+    </choice>
+    <ee:transform doc:name="Set Correlation ID and Init Counters" doc:id="doc-b1858b2c">
+      <ee:variables doc:id="doc-a28860db">
+        <ee:set-variable variableName="correlationId" doc:id="doc-a77c0a12">
+          %dw 2.0
+output application/json
+---
+attributes.headers['x-correlation-id'] default uuid()
+        </ee:set-variable>
+        <ee:set-variable variableName="numberOfFilesSent" doc:id="doc-a27a0fa3">
+          %dw 2.0
+output application/json
+---
+sizeOf(payload.files default [])
+        </ee:set-variable>
+        <ee:set-variable variableName="numberOfFilesSuccessfullyUploaded" doc:id="doc-642db6a0">
+          %dw 2.0
+output application/json
+---
+0
+        </ee:set-variable>
+        <ee:set-variable variableName="numberOfFilesUpserted" doc:id="doc-e795ac4c">
+          %dw 2.0
+output application/json
+---
+0
+        </ee:set-variable>
+        <ee:set-variable variableName="numberOfFilesUploadedToKnowledge" doc:id="doc-244169c6">
+          %dw 2.0
+output application/json
+---
+0
+        </ee:set-variable>
+        <ee:set-variable variableName="filesUploadedAndUpserted" doc:id="doc-63d29694">
+          %dw 2.0
+output application/json
+---
+[]
+        </ee:set-variable>
+        <ee:set-variable variableName="fileErrors" doc:id="doc-83286033">
+          %dw 2.0
+output application/json
+---
+[]
+        </ee:set-variable>
+        <ee:set-variable variableName="originalFiles" doc:id="doc-c15e354e">
+          %dw 2.0
+output application/json
+---
+payload.files default []
+        </ee:set-variable>
+      </ee:variables>
+    </ee:transform>
+    <flow-ref name="process-info-logger-sub-flow" doc:name="Call process-info-logger-sub-flow (Logger)" doc:id="doc-hwhf4h1g" />
+    <flow-ref name="validate-upload-batch-request-sub-flow" doc:name="Validate Request" doc:id="doc-f3aa4b7c" />
+    <flow-ref name="get-salesforce-access-token-sub-flow" doc:name="Get Salesforce Access Token" doc:id="doc-0670731d" />
+    <foreach collection="#[payload.files]" doc:name="For Each File in Batch" doc:id="doc-83182e32">
+      <ee:transform doc:name="Set Current File Variables" doc:id="doc-8e801f99">
+        <ee:variables doc:id="doc-10956f52">
+          <ee:set-variable variableName="currentFile" doc:id="doc-9e936fa7">
+            %dw 2.0
+output application/json
+---
+payload
+          </ee:set-variable>
+          <ee:set-variable variableName="currentFileName" doc:id="doc-22f1f771">
+            %dw 2.0
+output application/json
+---
+payload.fileName
+          </ee:set-variable>
+        </ee:variables>
+      </ee:transform>
+      <flow-ref name="process-info-logger-sub-flow" doc:name="Call process-info-logger-sub-flow (Logger)" doc:id="doc-3tkavbxo" />
+      <http:request method="GET" path="#['/query?q=SELECT+Id,ContentDocumentId,PathOnClient+FROM+ContentVersion+WHERE+PathOnClient=%27' ++ vars.currentFileName ++ '%27+ORDER+BY+CreatedDate+DESC+LIMIT+1']" config-ref="salesforceApiConfig" doc:name="Query ContentVersion by PathOnClient" target="contentVersionQueryResult" doc:id="doc-b09b1a72">
+        <http:headers>#[{'Authorization': 'Bearer ' ++ vars.salesforceAccessToken, 'X-Correlation-Id': vars.correlationId default ''}]</http:headers>
+      </http:request>
+      <ee:transform doc:name="Extract ContentDocumentId" doc:id="doc-f75560b4">
+        <ee:variables doc:id="doc-65c49d23">
+          <ee:set-variable variableName="existingContentDocumentId" doc:id="doc-45d46572">
+            %dw 2.0
+output application/json
+---
+if ((vars.contentVersionQueryResult.body.totalSize default 0) > 0 and vars.contentVersionQueryResult.body.records[0].ContentDocumentId != null)
+  vars.contentVersionQueryResult.body.records[0].ContentDocumentId
+else null
+          </ee:set-variable>
+          <ee:set-variable variableName="existingContentVersionId" doc:id="doc-4a90f238">
+            %dw 2.0
+output application/json
+---
+if ((vars.contentVersionQueryResult.body.totalSize default 0) > 0)
+  vars.contentVersionQueryResult.body.records[0].Id
+else null
+          </ee:set-variable>
+        </ee:variables>
+      </ee:transform>
+      <choice doc:name="ContentDocumentId Exists?" doc:id="doc-319c597f">
+        <when expression="#[vars.existingContentDocumentId != null]" doc:id="doc-8297308e">
+          <flow-ref name="process-info-logger-sub-flow" doc:name="Call process-info-logger-sub-flow (Logger)" doc:id="doc-j24fwjoj" />
+          <ee:transform doc:name="Build ContentVersion Update Payload" doc:id="doc-55d2440e">
+            <ee:message doc:id="doc-be1346b0">
+              <ee:set-payload resource="dw/build-contentversion-update-payload.dwl" />
+            </ee:message>
+          </ee:transform>
+          <http:request method="PATCH" path="#['/sobjects/ContentVersion/' ++ vars.existingContentVersionId]" config-ref="salesforceApiConfig" doc:name="Update ContentVersion (Upsert)" target="upsertResult" doc:id="doc-2fc6874a">
+            <http:headers>#[{'Authorization': 'Bearer ' ++ vars.salesforceAccessToken, 'Content-Type': 'application/json', 'X-Correlation-Id': vars.correlationId default ''}]</http:headers>
+          </http:request>
+          <ee:transform doc:name="Record Upsert Success" doc:id="doc-5fe9f75f">
+            <ee:variables doc:id="doc-8aa99bdf">
+              <ee:set-variable variableName="filesUploadedAndUpserted" doc:id="doc-82405286">
+                %dw 2.0
+output application/json
+---
+vars.filesUploadedAndUpserted ++ [{
+  fileName: vars.currentFileName,
+  salesforceContentDocumentId: vars.existingContentDocumentId,
+  operation: 'upsert',
+  status: 'SUCCESS'
+}]
+              </ee:set-variable>
+              <ee:set-variable variableName="numberOfFilesUpserted" doc:id="doc-f9c43852">
+                %dw 2.0
+output application/json
+---
+vars.numberOfFilesUpserted + 1
+              </ee:set-variable>
+            </ee:variables>
+          </ee:transform>
+          <flow-ref name="process-info-logger-sub-flow" doc:name="Call process-info-logger-sub-flow (Logger)" doc:id="doc-ojofc4xe" />
+        </when>
+        <otherwise doc:id="doc-47a711d9">
+          <flow-ref name="process-info-logger-sub-flow" doc:name="Call process-info-logger-sub-flow (Logger)" doc:id="doc-24vvm5q6" />
+          <ee:transform doc:name="Build ContentVersion Create Payload" doc:id="doc-86a7c1cd">
+            <ee:message doc:id="doc-f02b069c">
+              <ee:set-payload resource="dw/build-contentversion-create-payload.dwl" />
+            </ee:message>
+          </ee:transform>
+          <http:request method="POST" path="/sobjects/ContentVersion" config-ref="salesforceApiConfig" doc:name="Create ContentVersion (Insert)" target="createContentVersionResult" doc:id="doc-26a699aa">
+            <http:headers>#[{'Authorization': 'Bearer ' ++ vars.salesforceAccessToken, 'Content-Type': 'application/json', 'X-Correlation-Id': vars.correlationId default ''}]</http:headers>
+          </http:request>
+          <ee:transform doc:name="Extract New ContentVersion Id" doc:id="doc-84d60d74">
+            <ee:variables doc:id="doc-d84c5e9e">
+              <ee:set-variable variableName="newContentVersionId" doc:id="doc-ea2fe534">
+                %dw 2.0
+output application/json
+---
+vars.createContentVersionResult.body.id default ''
+              </ee:set-variable>
+            </ee:variables>
+          </ee:transform>
+          <http:request method="GET" path="#['/query?q=SELECT+ContentDocumentId+FROM+ContentVersion+WHERE+Id=%27' ++ vars.newContentVersionId ++ '%27']" config-ref="salesforceApiConfig" doc:name="Query ContentDocumentId for New Record" target="newContentDocIdQueryResult" doc:id="doc-021b64cc">
+            <http:headers>#[{'Authorization': 'Bearer ' ++ vars.salesforceAccessToken, 'X-Correlation-Id': vars.correlationId default ''}]</http:headers>
+          </http:request>
+          <ee:transform doc:name="Extract New ContentDocumentId" doc:id="doc-e0983709">
+            <ee:variables doc:id="doc-393a3e94">
+              <ee:set-variable variableName="newContentDocumentId" doc:id="doc-7e3157a1">
+                %dw 2.0
+output application/json
+---
+vars.newContentDocIdQueryResult.body.records[0].ContentDocumentId default ''
+              </ee:set-variable>
+            </ee:variables>
+          </ee:transform>
+          <ee:transform doc:name="Build Composite Request Body" doc:id="doc-85200544">
+            <ee:message doc:id="doc-cf3055e8">
+              <ee:set-payload resource="dw/build-composite-request-body.dwl" />
+            </ee:message>
+          </ee:transform>
+          <http:request method="POST" path="/composite" config-ref="salesforceApiConfig" doc:name="Send Composite Request to Salesforce" target="compositeResult" doc:id="doc-6810ab82">
+            <http:headers>#[{'Authorization': 'Bearer ' ++ vars.salesforceAccessToken, 'Content-Type': 'application/json', 'X-Correlation-Id': vars.correlationId default ''}]</http:headers>
+          </http:request>
+          <ee:transform doc:name="Record Insert and Composite Success" doc:id="doc-9db0851e">
+            <ee:variables doc:id="doc-d91b9dee">
+              <ee:set-variable variableName="filesUploadedAndUpserted" doc:id="doc-2a1fabbe">
+                %dw 2.0
+output application/json
+---
+vars.filesUploadedAndUpserted ++ [{
+  fileName: vars.currentFileName,
+  salesforceContentDocumentId: vars.newContentDocumentId,
+  operation: 'upload',
+  status: 'SUCCESS'
+}]
+              </ee:set-variable>
+              <ee:set-variable variableName="numberOfFilesSuccessfullyUploaded" doc:id="doc-911b94e6">
+                %dw 2.0
+output application/json
+---
+vars.numberOfFilesSuccessfullyUploaded + 1
+              </ee:set-variable>
+              <ee:set-variable variableName="numberOfFilesUploadedToKnowledge" doc:id="doc-0e058f84">
+                %dw 2.0
+output application/json
+---
+vars.numberOfFilesUploadedToKnowledge + 1
+              </ee:set-variable>
+            </ee:variables>
+          </ee:transform>
+          <flow-ref name="process-info-logger-sub-flow" doc:name="Call process-info-logger-sub-flow (Logger)" doc:id="doc-8snse9sh" />
+        </otherwise>
+      </choice>
+    </foreach>
+    <choice doc:name="All Files Failed? Publish to DLQ" doc:id="doc-5fc999e7">
+      <when expression="#[sizeOf(vars.fileErrors default []) == vars.numberOfFilesSent and vars.numberOfFilesSent &gt; 0]" doc:id="doc-7a8bf61b">
+        <flow-ref name="process-info-logger-sub-flow" doc:name="Call process-info-logger-sub-flow (Logger)" doc:id="doc-tql3vt8d" />
+        <ee:transform doc:name="Build DLQ Payload" doc:id="doc-8feb4a49">
+          <ee:message doc:id="doc-d2f61849">
+            <ee:set-payload resource="dw/build-dlq-payload.dwl" />
+          </ee:message>
+        </ee:transform>
+        <sqs:send-message config-ref="AmazonSQS_Config" queueUrl="${aws.sqs.dlq.url}" doc:name="Publish Failed Batch to DLQ" doc:id="doc-4e55bd18" />
+      </when>
+      <otherwise doc:id="doc-d4969929">
+        <flow-ref name="process-info-logger-sub-flow" doc:name="Call process-info-logger-sub-flow (Logger)" doc:id="doc-9rejdzrp" />
+      </otherwise>
+    </choice>
+    <ee:transform doc:name="Build Upload Batch Response" doc:id="doc-cd4a1d89">
+      <ee:message doc:id="doc-34febcbf">
+        <ee:set-payload resource="dw/build-upload-batch-response.dwl" />
+      </ee:message>
+      <ee:variables doc:id="doc-f8e6311d">
+        <ee:set-variable variableName="httpStatus" doc:id="doc-5350e342">
+          201
+        </ee:set-variable>
+        <ee:set-variable variableName="outboundHeaders" doc:id="doc-f6be8e8c">
+          %dw 2.0
+output application/json
+---
+(vars.outboundHeaders default {}) ++ {'X-Correlation-Id': vars.correlationId default ''}
+        </ee:set-variable>
+      </ee:variables>
+    </ee:transform>
+    <flow-ref name="process-info-logger-sub-flow" doc:name="Call process-info-logger-sub-flow (Logger)" doc:id="doc-gkbygbwt" />
+    <error-handler ref="globalErrorHandler" />
+  </flow>
+
+</mule>

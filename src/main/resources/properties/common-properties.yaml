@@ -1,38 +1,36 @@
 http:
   host: "0.0.0.0"
   port: "8081"
-  protocol: "HTTP"
   timeout: "30000"
   request:
     host: "api.example.com"
     port: "443"
     protocol: "HTTPS"
     timeout: "30000"
-mq:
-  url: "https://mq-us-east-1.anypoint.mulesoft.com/api/v1"
+tls:
+  keystore:
+    path: "/api"
+salesforce:
+  apiVersion: "1.0.0"
+  knowledgeArticleId: "CHANGEME"
+  contentWorkspaceId: "CHANGEME"
 mule:
   env: "dev"
 secure:
   key: "CHANGEME"
+splunk-log4j2-appender:
+  host: "service.example.com"
+  port: "8080"
+aws:
+  sqs:
+    region: "us-east-1"
+    accessKey: "CHANGEME"
+    dlq:
+      url: "CHANGEME"
 api:
-  retry:
-    maxRetries: "3"
-    delayMs: "5000"
   id: "23453"
   majorVersion: "v1"
   name: "salesforce-system-api-sapi"
-salesforce:
-  host: "service.example.com"
-  apiVersion: "1.0.0"
-  linkedEntityId: "CHANGEME"
-  contentWorkspaceId: "CHANGEME"
-dlq:
-  queue:
-    destination: "UNSET-QUEUE-OVERRIDE-IN-CONFIG"
-queue:
-  salesforce-system-api:
-    dlq:
-      destination: "UNSET-QUEUE-OVERRIDE-IN-CONFIG"
 priority:
   debug: "DEBUG"
   info: "INFO"

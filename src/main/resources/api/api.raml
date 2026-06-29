@@ -13,32 +13,30 @@ traits:
   error-response: !include /exchange_modules/aceb673b-30f8-4591-982c-8ed2cd883a70/istika-error-responses/1.0.6/istika-error-responses.raml
 
 
-/salesforce-system-api:
-  description: Operations for Salesforce-system-api
-  /files:
-    description: Operations for Salesforce-system-api/files/upload
-    /upload:
-      description: Operations for Salesforce-system-api/files/upload
-      post:
-        displayName: Create new salesforce-system-api/files/upload
-        is: [error-response,traitsLib.oauth-2-0,traitsLib.correlationId]
-        description: Create Salesforce-system-api/files/upload in the system
-        body:
-          application/json:
-            type: !include resources/schemas/PostSalesforceSystemApiFilesUploadRequest.raml
-            example: !include resources/examples/PostSalesforceSystemApiFilesUploadRequest.json
-        responses:
-          201:
-            description: Successful response
-            headers:
-              Content-Type:
-                type: string
-                required: true
-                example: application/json
-            body:
-              application/json:
-                type: !include resources/schemas/PostSalesforceSystemApiFilesUploadResponse.raml
-                example: !include resources/examples/PostSalesforceSystemApiFilesUploadResponse.json
+/files:
+  description: Operations for Files/upload-batch
+  /upload-batch:
+    description: Operations for Files/upload-batch
+    post:
+      displayName: Create new files/upload-batch
+      is: [error-response,traitsLib.oauth-2-0,traitsLib.correlationId]
+      description: Create Files/upload-batch in the system
+      body:
+        application/json:
+          type: !include resources/schemas/PostFilesUploadBatchRequest.raml
+          example: !include resources/examples/PostFilesUploadBatchRequest.json
+      responses:
+        201:
+          description: Successful response
+          headers:
+            Content-Type:
+              type: string
+              required: true
+              example: application/json
+          body:
+            application/json:
+              type: !include resources/schemas/PostFilesUploadBatchResponse.raml
+              example: !include resources/examples/PostFilesUploadBatchResponse.json
 
 /health:
   description: Operations for Health

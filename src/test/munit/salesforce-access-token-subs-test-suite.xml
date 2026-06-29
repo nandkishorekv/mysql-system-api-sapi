@@ -12,23 +12,35 @@
 
 	<munit:config name="salesforce-access-token-subs-test-suite.xml" />
 
-	<munit:before-suite name="salesforce-access-token-subs-before-suite" doc:id="02d1105d-7cc6-448b-8db7-e0231ab2cd22">
-		<munit-tools:store key="test.environment" doc:id="0c118fac-7442-4913-a6c2-d8673822ef21">
+	<munit:before-suite name="salesforce-access-token-subs-before-suite" doc:id="b84458e6-b070-4fb0-ba88-99a7ad326e69">
+		<munit-tools:store key="test.environment" doc:id="01538148-781f-43fe-9415-b0be2847973f">
 			<munit-tools:value>#["test"]</munit-tools:value>
 		</munit-tools:store>
-		<logger level="INFO" doc:id="705e5080-ff24-4bce-9872-e90c8df9ef3a"
+		<logger level="INFO" doc:id="ee2f3306-892a-49ba-a1e8-479700776b6a"
 		        message="Starting salesforce-access-token-subs Test Suite"/>
 	</munit:before-suite>
 
 	<munit:test name="get-salesforce-access-token-sub-flowTest"
-	            doc:id="050a0cee-545f-48bd-bf4e-cb2f195486de"
-	            description="Test get-salesforce-access-token-sub-flow - retrieve">
+	            doc:id="cbbf04a6-44e1-494e-8da0-16fe4299f907"
+	            description="Test get-salesforce-access-token-sub-flow - contains">
 		<munit:behavior>
+			<munit-tools:mock-when doc:name="Mock os:contains"
+			                        doc:id="061eb2e0-e051-4a60-8135-7aa710ede06f"
+			                        processor="os:contains">
+				<munit-tools:with-attributes>
+					<munit-tools:with-attribute whereValue="doc-109d4d30" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return>
+					<munit-tools:payload value='#[output application/java --- false]'
+					                      mediaType="application/java"
+					                      encoding="UTF-8"/>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
 			<munit-tools:mock-when doc:name="Mock os:retrieve"
-			                        doc:id="f752a2a0-7b91-4bc3-948c-a5583dd96b0a"
+			                        doc:id="07ca181a-2edc-4c1f-8f29-10e9cd22b57e"
 			                        processor="os:retrieve">
 				<munit-tools:with-attributes>
-					<munit-tools:with-attribute whereValue="doc-93563d45" attributeName="doc:id" />
+					<munit-tools:with-attribute whereValue="doc-f4501e08" attributeName="doc:id" />
 				</munit-tools:with-attributes>
 				<munit-tools:then-return>
 					<munit-tools:payload value='#[output application/java --- {"id":1,"value":"test-value"}]'
@@ -36,7 +48,31 @@
 					                      encoding="UTF-8"/>
 				</munit-tools:then-return>
 			</munit-tools:mock-when>
-			<munit-tools:mock-when doc:name="Mock process-info-logger-sub-flow" doc:id="1c5e69c8-66ba-442e-85a7-1e5567303871" processor="flow-ref">
+			<munit-tools:mock-when doc:name="Mock http:request"
+			                        doc:id="1428c64e-910e-43da-a208-7fe6ad152598"
+			                        processor="http:request">
+				<munit-tools:with-attributes>
+					<munit-tools:with-attribute whereValue="doc-6a8ae8d9" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return>
+					<munit-tools:payload value='#[output application/json --- {"id":1,"success":true}]'
+					                      mediaType="application/json"
+					                      encoding="UTF-8"/>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock os:store"
+			                        doc:id="8a58cfa2-e06f-441e-8c73-f2c23ad2f263"
+			                        processor="os:store">
+				<munit-tools:with-attributes>
+					<munit-tools:with-attribute whereValue="doc-a17be9d4" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return>
+					<munit-tools:payload value='#[output application/java --- {"success":true}]'
+					                      mediaType="application/java"
+					                      encoding="UTF-8"/>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock process-info-logger-sub-flow" doc:id="7d107e57-a37d-4baf-8776-34beb812c11e" processor="flow-ref">
 				<munit-tools:with-attributes>
 					<munit-tools:with-attribute whereValue="process-info-logger-sub-flow" attributeName="name"/>
 				</munit-tools:with-attributes>
@@ -44,7 +80,31 @@
 					<munit-tools:payload value='#[payload]' mediaType="application/json" encoding="UTF-8"/>
 				</munit-tools:then-return>
 			</munit-tools:mock-when>
-			<munit-tools:mock-when doc:name="Mock process-info-logger-sub-flow" doc:id="87c0796c-38c2-49d0-b932-1565be505152" processor="flow-ref">
+			<munit-tools:mock-when doc:name="Mock process-info-logger-sub-flow" doc:id="485e484a-43fe-4535-bcde-db1ef0822c0d" processor="flow-ref">
+				<munit-tools:with-attributes>
+					<munit-tools:with-attribute whereValue="process-info-logger-sub-flow" attributeName="name"/>
+				</munit-tools:with-attributes>
+				<munit-tools:then-return>
+					<munit-tools:payload value='#[payload]' mediaType="application/json" encoding="UTF-8"/>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock process-info-logger-sub-flow" doc:id="50c2234a-5f04-486c-932f-1e736cc0e1bc" processor="flow-ref">
+				<munit-tools:with-attributes>
+					<munit-tools:with-attribute whereValue="process-info-logger-sub-flow" attributeName="name"/>
+				</munit-tools:with-attributes>
+				<munit-tools:then-return>
+					<munit-tools:payload value='#[payload]' mediaType="application/json" encoding="UTF-8"/>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock process-info-logger-sub-flow" doc:id="97e554b8-5fad-46d1-b710-e0fce8f35b68" processor="flow-ref">
+				<munit-tools:with-attributes>
+					<munit-tools:with-attribute whereValue="process-info-logger-sub-flow" attributeName="name"/>
+				</munit-tools:with-attributes>
+				<munit-tools:then-return>
+					<munit-tools:payload value='#[payload]' mediaType="application/json" encoding="UTF-8"/>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock process-info-logger-sub-flow" doc:id="14a857ff-7f66-472f-975c-2e8b48ac77c0" processor="flow-ref">
 				<munit-tools:with-attributes>
 					<munit-tools:with-attribute whereValue="process-info-logger-sub-flow" attributeName="name"/>
 				</munit-tools:with-attributes>
@@ -56,39 +116,51 @@
 
 		<munit:execution>
 			<!-- Setup Mule event with variables -->
-			<munit:set-event doc:name="Set Event" doc:id="d813fb18-fea7-4ebf-8986-9684501cefbd">
+			<munit:set-event doc:name="Set Event" doc:id="6e0a783a-b3cd-41b0-85b5-58f10255e177">
 				<munit:variables>
-					<munit:variable key="cachedSalesforceToken" value='#["test-cachedSalesforceToken"]' />
+					<munit:variable key="tokenExists" value='#[true]' />
 					<munit:variable key="salesforceAccessToken" value='#["test-salesforceAccessToken"]' />
-					<munit:variable key="salesforceInstanceUrl" value='#["test-salesforceInstanceUrl"]' />
+					<munit:variable key="tokenResponse" value='#["test-tokenResponse"]' />
 				</munit:variables>
 			</munit:set-event>
 
 			<flow-ref doc:name="Flow-ref to get-salesforce-access-token-sub-flow"
-			          doc:id="85a8d861-f897-4502-a22d-bcfde8d4ff29"
+			          doc:id="f8157f92-fc14-46a9-9853-33c881373995"
 			          name="get-salesforce-access-token-sub-flow"/>
 		</munit:execution>
 
 		<munit:validation>
 			<munit-tools:assert-that doc:name="Assert payload not null"
-			                          doc:id="7bb41290-461c-49ce-ae7c-9d6711e05923"
+			                          doc:id="7bc5aa24-1dc5-4909-be99-32f4447b0ab0"
 			                          expression="#[payload]"
 			                          is="#[MunitTools::notNullValue()]"/>
 
-			<logger level="INFO" doc:id="1ea087e3-e3ff-4d54-963e-6d3d57e7055d"
+			<logger level="INFO" doc:id="2cdd65fe-3542-4bd7-9bd8-9675686194d3"
 			        message="#['Test payload: ' ++ write(payload, 'application/json')]"/>
 		</munit:validation>
 	</munit:test>
 
 	<munit:test name="get-salesforce-access-token-sub-flow-idempotency-skipTest"
-	            doc:id="3f926db3-5810-421a-9360-b4b10b58ebfa"
-	            description="Test get-salesforce-access-token-sub-flow-idempotency-skip - retrieve">
+	            doc:id="c7c98006-9636-4ae0-be4c-326fc30d001f"
+	            description="Test get-salesforce-access-token-sub-flow-idempotency-skip - contains">
 		<munit:behavior>
+			<munit-tools:mock-when doc:name="Mock os:contains"
+			                        doc:id="32a5ec95-c09f-47c9-b464-f3747cac3c8c"
+			                        processor="os:contains">
+				<munit-tools:with-attributes>
+					<munit-tools:with-attribute whereValue="doc-109d4d30" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return>
+					<munit-tools:payload value='#[output application/java --- false]'
+					                      mediaType="application/java"
+					                      encoding="UTF-8"/>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
 			<munit-tools:mock-when doc:name="Mock os:retrieve"
-			                        doc:id="77394ecb-1734-40d2-a6f8-a7d1dcd14220"
+			                        doc:id="cd6d7e91-43e2-411c-b4c2-9693816e5b18"
 			                        processor="os:retrieve">
 				<munit-tools:with-attributes>
-					<munit-tools:with-attribute whereValue="doc-93563d45" attributeName="doc:id" />
+					<munit-tools:with-attribute whereValue="doc-f4501e08" attributeName="doc:id" />
 				</munit-tools:with-attributes>
 				<munit-tools:then-return>
 					<munit-tools:payload value='#[output application/java --- { "exists": true }]'
@@ -96,7 +168,31 @@
 					                      encoding="UTF-8"/>
 				</munit-tools:then-return>
 			</munit-tools:mock-when>
-			<munit-tools:mock-when doc:name="Mock process-info-logger-sub-flow" doc:id="1f166060-a26e-41e7-8045-fac4a2224220" processor="flow-ref">
+			<munit-tools:mock-when doc:name="Mock http:request"
+			                        doc:id="e2567846-9354-4e24-8c7a-fe17c7e723ae"
+			                        processor="http:request">
+				<munit-tools:with-attributes>
+					<munit-tools:with-attribute whereValue="doc-6a8ae8d9" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return>
+					<munit-tools:payload value='#[output application/json --- {"id":1,"success":true}]'
+					                      mediaType="application/json"
+					                      encoding="UTF-8"/>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock os:store"
+			                        doc:id="3a15c9ab-fe1d-4bb7-a5ad-ae5a8c5fbdc3"
+			                        processor="os:store">
+				<munit-tools:with-attributes>
+					<munit-tools:with-attribute whereValue="doc-a17be9d4" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return>
+					<munit-tools:payload value='#[output application/java --- {"success":true}]'
+					                      mediaType="application/java"
+					                      encoding="UTF-8"/>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock process-info-logger-sub-flow" doc:id="2bda35e6-ba60-4aee-ad4d-207eaafdd209" processor="flow-ref">
 				<munit-tools:with-attributes>
 					<munit-tools:with-attribute whereValue="process-info-logger-sub-flow" attributeName="name"/>
 				</munit-tools:with-attributes>
@@ -104,7 +200,31 @@
 					<munit-tools:payload value='#[payload]' mediaType="application/json" encoding="UTF-8"/>
 				</munit-tools:then-return>
 			</munit-tools:mock-when>
-			<munit-tools:mock-when doc:name="Mock process-info-logger-sub-flow" doc:id="74e56276-293d-4edb-bdc0-1f2bd6c06791" processor="flow-ref">
+			<munit-tools:mock-when doc:name="Mock process-info-logger-sub-flow" doc:id="37002112-1328-4455-ad31-942d27ad22f2" processor="flow-ref">
+				<munit-tools:with-attributes>
+					<munit-tools:with-attribute whereValue="process-info-logger-sub-flow" attributeName="name"/>
+				</munit-tools:with-attributes>
+				<munit-tools:then-return>
+					<munit-tools:payload value='#[payload]' mediaType="application/json" encoding="UTF-8"/>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock process-info-logger-sub-flow" doc:id="8eef1e16-65e1-4f5f-9d72-3d7a52a92577" processor="flow-ref">
+				<munit-tools:with-attributes>
+					<munit-tools:with-attribute whereValue="process-info-logger-sub-flow" attributeName="name"/>
+				</munit-tools:with-attributes>
+				<munit-tools:then-return>
+					<munit-tools:payload value='#[payload]' mediaType="application/json" encoding="UTF-8"/>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock process-info-logger-sub-flow" doc:id="a322956e-795d-4f4a-a3eb-9d81c49fff43" processor="flow-ref">
+				<munit-tools:with-attributes>
+					<munit-tools:with-attribute whereValue="process-info-logger-sub-flow" attributeName="name"/>
+				</munit-tools:with-attributes>
+				<munit-tools:then-return>
+					<munit-tools:payload value='#[payload]' mediaType="application/json" encoding="UTF-8"/>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock process-info-logger-sub-flow" doc:id="8e383804-2742-4e9b-aa74-885dbfc03438" processor="flow-ref">
 				<munit-tools:with-attributes>
 					<munit-tools:with-attribute whereValue="process-info-logger-sub-flow" attributeName="name"/>
 				</munit-tools:with-attributes>
@@ -116,33 +236,33 @@
 
 		<munit:execution>
 			<!-- Setup Mule event with variables -->
-			<munit:set-event doc:name="Set Event" doc:id="f6d9580c-be17-417e-9259-572c478a896e">
+			<munit:set-event doc:name="Set Event" doc:id="e9b1a30e-f851-4ffb-a45d-c7e8786bd76d">
 				<munit:variables>
-					<munit:variable key="cachedSalesforceToken" value='#["test-cachedSalesforceToken"]' />
+					<munit:variable key="tokenExists" value='#[true]' />
 					<munit:variable key="salesforceAccessToken" value='#["test-salesforceAccessToken"]' />
-					<munit:variable key="salesforceInstanceUrl" value='#["test-salesforceInstanceUrl"]' />
+					<munit:variable key="tokenResponse" value='#["test-tokenResponse"]' />
 				</munit:variables>
 			</munit:set-event>
 
 			<flow-ref doc:name="Flow-ref to get-salesforce-access-token-sub-flow-idempotency-skip"
-			          doc:id="7ac619cd-46a7-4238-a408-68a5e8b491a4"
+			          doc:id="639925df-a78a-49d9-9298-fe081adf3446"
 			          name="get-salesforce-access-token-sub-flow-idempotency-skip"/>
 		</munit:execution>
 
 		<munit:validation>
 			<munit-tools:assert-that doc:name="Assert payload not null"
-			                          doc:id="362652be-bddc-41aa-bad7-2ea0d7804d63"
+			                          doc:id="7451ff30-c490-4447-8e41-c6ce1e8bf48c"
 			                          expression="#[payload]"
 			                          is="#[MunitTools::notNullValue()]"/>
 
-			<logger level="INFO" doc:id="11580bd9-ff29-4c4e-aa03-eb262b188dbd"
+			<logger level="INFO" doc:id="41f2a525-ba08-4dcf-a530-14e106eb67b1"
 			        message="#['Test payload: ' ++ write(payload, 'application/json')]"/>
 		</munit:validation>
 	</munit:test>
 
 
-	<munit:after-suite name="salesforce-access-token-subs-after-suite" doc:id="8eae7c71-5a26-4757-9f70-9364a29673c0">
-		<logger level="INFO" doc:id="6bd6e397-ca57-4db8-817d-27c64ab68cbb"
+	<munit:after-suite name="salesforce-access-token-subs-after-suite" doc:id="524b8343-dcc1-452a-861e-2a36f90f8a6e">
+		<logger level="INFO" doc:id="3cda2030-7ac3-4b64-8c83-4d943a32a6d2"
 		        message="salesforce-access-token-subs Test Suite completed successfully"/>
 	</munit:after-suite>
 

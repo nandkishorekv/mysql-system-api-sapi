@@ -8,8 +8,8 @@
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
   <apikit:config name="salesforce-system-api-sapi-apikit-config" raml="api.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" doc:name="APIKit Router Config" />
 
-  <flow name="salesforce-system-api-sapi-api-main" doc:name="salesforce-system-api-sapi API Main" doc:id="59daa21c-56b8-8faf-1247-ca6d84af0a69">
-    <http:listener path="/api/${api.majorVersion}/*" config-ref="HTTP_Listener_config" doc:name="HTTP Listener" doc:id="11566592-7e11-2d1a-b0fd-8d67922100af">
+  <flow name="salesforce-system-api-sapi-api-main" doc:name="salesforce-system-api-sapi API Main" doc:id="88f43545-24c3-3cd8-ed4c-0a70d5b7c9df">
+    <http:listener path="/api/${api.majorVersion}/*" config-ref="HTTP_Listener_config" doc:name="HTTP Listener" doc:id="fc41d236-68e0-ae88-f726-01a9fcb00ff4">
       <http:response statusCode="#[vars.httpStatus default 200]">
         <http:headers>#[(vars.outboundHeaders default {}) ++ {'X-Correlation-Id': vars.correlationId default ''}]</http:headers>
       </http:response>
@@ -18,15 +18,16 @@
         <http:headers>#[(vars.outboundHeaders default {}) ++ {'X-Correlation-Id': vars.correlationId default ''}]</http:headers>
       </http:error-response>
     </http:listener>
-    <apikit:router config-ref="salesforce-system-api-sapi-apikit-config" doc:name="APIKit Router" doc:id="9ecd7346-3997-479b-b54e-e91ee8379796" />
+    <apikit:router config-ref="salesforce-system-api-sapi-apikit-config" doc:name="APIKit Router" doc:id="62182529-4fd7-0593-f544-71f7210240b8" />
+    <error-handler ref="globalErrorHandler" />
   </flow>
 
-  <flow name="post:\salesforce-system-api\files\upload:salesforce-system-api-sapi-apikit-config" doc:name="post:\salesforce-system-api\files\upload:salesforce-system-api-sapi-apikit-config" doc:id="7c08ee40-0a87-3de4-01dc-10a4e45938e1">
-    <flow-ref doc:name="post-salesforce-system-api-files-upload-flow" doc:id="fe7b3fde-6021-e9e6-fd34-c90e27bbb9d7" name="post-salesforce-system-api-files-upload-flow" />
+  <flow name="post:\files\upload-batch:salesforce-system-api-sapi-apikit-config" doc:name="post:\files\upload-batch:salesforce-system-api-sapi-apikit-config" doc:id="abbfea5e-04b5-f939-e27b-385156462792">
+    <flow-ref doc:name="post-files-upload-batch-flow" doc:id="15675f9e-72dd-6ccf-cd6b-c5a3b0c80e0f" name="post-files-upload-batch-flow" />
   </flow>
 
-  <flow name="get:\health:salesforce-system-api-sapi-apikit-config" doc:name="get:\health:salesforce-system-api-sapi-apikit-config" doc:id="4c17d6f0-b4ea-c385-9a7d-5cb2c4bb28f3">
-    <flow-ref doc:name="get-health-flow" doc:id="8e6ddb11-e5dd-6bed-92af-25b24db9e0ba" name="get-health-flow" />
+  <flow name="get:\health:salesforce-system-api-sapi-apikit-config" doc:name="get:\health:salesforce-system-api-sapi-apikit-config" doc:id="2e95944c-d5e4-3f71-f7fb-d94a162381a7">
+    <flow-ref doc:name="get-health-flow" doc:id="b6af8f30-b5b8-b5b6-cb89-b2399d980ce4" name="get-health-flow" />
   </flow>
 
 </mule>

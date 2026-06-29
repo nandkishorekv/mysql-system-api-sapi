@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:munit="http://www.mulesoft.org/schema/mule/munit" 
+	xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+	xmlns="http://www.mulesoft.org/schema/mule/core" 
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+
+	<munit:config name="upload-batch-request-subs-test-suite.xml" />
+
+	<munit:before-suite name="upload-batch-request-subs-before-suite" doc:id="f87cdce7-ad9f-4292-98c3-5274f497dc1f">
+		<munit-tools:store key="test.environment" doc:id="83b0ccaa-f0a4-4b55-9433-53096458b928">
+			<munit-tools:value>#["test"]</munit-tools:value>
+		</munit-tools:store>
+		<logger level="INFO" doc:id="99ba4f32-69c4-475e-9623-cba3ec8fca45"
+		        message="Starting upload-batch-request-subs Test Suite"/>
+	</munit:before-suite>
+
+	<munit:test name="validate-upload-batch-request-sub-flowTest"
+	            doc:id="2c302fb2-36e8-4ea4-b5bd-5d5b26eddd80"
+	            description="Test validate-upload-batch-request-sub-flow - flow execution">
+		<munit:behavior>
+			<munit-tools:mock-when doc:name="Mock process-info-logger-sub-flow" doc:id="4abdea19-9b35-40aa-9efa-33040e14ebe4" processor="flow-ref">
+				<munit-tools:with-attributes>
+					<munit-tools:with-attribute whereValue="process-info-logger-sub-flow" attributeName="name"/>
+				</munit-tools:with-attributes>
+				<munit-tools:then-return>
+					<munit-tools:payload value='#[payload]' mediaType="application/json" encoding="UTF-8"/>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock process-info-logger-sub-flow" doc:id="bb9f6244-a6a7-4546-8d9c-e7e45361e91a" processor="flow-ref">
+				<munit-tools:with-attributes>
+					<munit-tools:with-attribute whereValue="process-info-logger-sub-flow" attributeName="name"/>
+				</munit-tools:with-attributes>
+				<munit-tools:then-return>
+					<munit-tools:payload value='#[payload]' mediaType="application/json" encoding="UTF-8"/>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+
+		<munit:execution>
+			<!-- Setup Mule event with payload -->
+			<munit:set-event doc:name="Set Event" doc:id="b27a50b8-b2da-4dae-84e6-d647e9f1d18d">
+				<munit:payload value='#[output application/json --- {
+  "files": "test-files"
+}]' mediaType="application/json" encoding="UTF-8" />
+			</munit:set-event>
+
+			<flow-ref doc:name="Flow-ref to validate-upload-batch-request-sub-flow"
+			          doc:id="70e2114b-1f77-476b-91a4-89794746d5c1"
+			          name="validate-upload-batch-request-sub-flow"/>
+		</munit:execution>
+
+		<munit:validation>
+			<munit-tools:assert-that doc:name="Assert payload not null"
+			                          doc:id="16cebb7f-ded5-4b46-a4da-96a5fbabc5f3"
+			                          expression="#[payload]"
+			                          is="#[MunitTools::notNullValue()]"/>
+
+			<logger level="INFO" doc:id="12ff4b18-ea18-4135-9a27-979002381c09"
+			        message="#['Test payload: ' ++ write(payload, 'application/json')]"/>
+		</munit:validation>
+	</munit:test>
+
+
+	<munit:after-suite name="upload-batch-request-subs-after-suite" doc:id="532c609f-8404-4172-a1eb-6eec9e1ff82b">
+		<logger level="INFO" doc:id="cb783461-bf1f-44eb-b80c-6cb496e801d7"
+		        message="upload-batch-request-subs Test Suite completed successfully"/>
+	</munit:after-suite>
+
+</mule>

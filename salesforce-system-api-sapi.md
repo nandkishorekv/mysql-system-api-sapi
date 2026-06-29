@@ -2,7 +2,7 @@
 
 **MuleSoft Integration Project Documentation**
 
-Last updated: 2026-06-20
+Last updated: 2026-06-19
 
 ##  Table of Contents
 
@@ -17,11 +17,10 @@ Last updated: 2026-06-20
 - [Key Features](#key-features)
 - [Technologies Used](#technologies-used)
 - [API Operations Summary](#api-operations-summary)
-  - [Upload APIs](#upload-apis)
+  - [Upload Batch APIs](#upload-batch-apis)
   - [Health APIs](#health-apis)
-- [Upload - Data Mapping Specification](#upload---data-mapping-specification)
-  - [Create / Update Upload Mapping](#create-update-upload-mapping)
-  - [Read Upload Response Mapping](#read-upload-response-mapping)
+- [Upload Batch - Data Mapping Specification](#upload-batch---data-mapping-specification)
+  - [Create / Update Upload Batch Mapping](#create-update-upload-batch-mapping)
 - [Error Handling](#error-handling)
 - [Logging & Monitoring](#logging-monitoring)
   - [Custom Logging Framework](#custom-logging-framework)
@@ -60,19 +59,20 @@ Design and implement RESTful APIs for seamless data exchange
 
 ### Architecture Style
 
-API-led Connectivity integrating Anypoint Mq, Object Store
+API-led Connectivity integrating Amazon, Object Store, Validation
 
 
 ### API Layers
 
-- **System API**: System-of-record adapter — integrates with Anypoint Mq, Object Store to expose data operations as REST APIs
+- **System API**: System-of-record adapter — integrates with Amazon, Object Store, Validation to expose data operations as REST APIs
 
 
 ### Connectors Used
 
 - **HTTP**: listener, response, headers, error-response, body, request, request-config, request-connection, listener-config, listener-connection
-- **Anypoint Mq**: connection, subscriber
-- **Object Store**: object-store, remove, retrieve
+- **Amazon**: send-message
+- **Object Store**: object-store, remove, contains, retrieve, store, value
+- **Validation**: is-true
 
 
 
@@ -84,7 +84,7 @@ API-led Connectivity integrating Anypoint Mq, Object Store
 - Create operations
 - Read/Retrieve operations
 - RESTful API endpoints
-- Integration using HTTP Connector, Anypoint Mq, Object Store
+- Integration using HTTP Connector, Amazon, Object Store, Validation
 - Error handling using Global Error Handlers
 - Reusable DataWeave transformations
 - Secure credential management
@@ -102,10 +102,12 @@ API-led Connectivity integrating Anypoint Mq, Object Store
 - DataWeave 2.0
 - HTTP Connector
 - Objectstore Connector
+- Amazon Sqs Connector
 - Salesforce Connector
 - MUnit Testing Framework
-- Anypoint Mq
+- Amazon
 - Object Store
+- Validation
 - APIKit Router
 - Secure Properties
 
@@ -116,11 +118,11 @@ API-led Connectivity integrating Anypoint Mq, Object Store
 
 ## API Operations Summary
 
-### Upload APIs
+### Upload Batch APIs
 
 | Operation | Method | Endpoint |
 |-----------|--------|----------|
-| Create Upload | POST | /salesforce-system-api/files/upload |
+| Create Upload batch | POST | /files/upload-batch |
 
 
 ### Health APIs
@@ -134,32 +136,16 @@ API-led Connectivity integrating Anypoint Mq, Object Store
 
 ---
 
-## Upload - Data Mapping Specification
+## Upload Batch - Data Mapping Specification
 
-### Create / Update Upload Mapping
+### Create / Update Upload Batch Mapping
 
 | Source Field (API Request) | Target Field | Type | Mandatory | Notes |
 |---------------------------|--------------|------|-----------|-------|
-| correlationId | correlationId | String | Yes | - |
-| batchId | batchId | String | Yes | - |
-| files | files | Array | Yes | - |
-
-
-### Read Upload Response Mapping
-
-| Source Field (Target System) | API Response Field | Type | Notes |
-|------------------------------|-------------------|------|-------|
-| correlationId | correlationId | String | - |
-| batchId | batchId | String | - |
-| filesSent | filesSent | Number | - |
-| filesUploaded | filesUploaded | Number | - |
-| filesUpserted | filesUpserted | Number | - |
-| filesUploadedToKnowledge | filesUploadedToKnowledge | Number | - |
-| uploadedFiles | uploadedFiles | Array | - |
-| upsertedFiles | upsertedFiles | Array | - |
-| failedFiles | failedFiles | Array | - |
-| processingTimestamp | processingTimestamp | String | - |
-| errors | errors | Array | - |
+| id | id | String | No | Unique identifier (system-generated) |
+| name | name | String | Yes | - |
+| status | status | String | No | Current status |
+| createdDate | createdDate | Date | No | ISO 8601 date format |
 
 
 
@@ -170,11 +156,10 @@ API-led Connectivity integrating Anypoint Mq, Object Store
 
 | Scenario | Error Code | Message |
 |----------|------------|----------|
-| Anypoint Mq — acking error | 500 | Internal server error |
-| Anypoint Mq — retry exhausted error | 500 | Internal server error |
 | Os — connectivity error | 503 | Downstream service unavailable |
 | Http — timeout error | 503 | Downstream service unavailable |
 | Http — connectivity error | 503 | Downstream service unavailable |
+| Validation — rejected error | 400 | Invalid request payload |
 | Mule — expression error | 500 | Internal server error |
 | Mule — connectivity error | 503 | Downstream service unavailable |
 | Unhandled error (catch-all) | 500 | Unexpected error during request processing |
@@ -201,6 +186,7 @@ API-led Connectivity integrating Anypoint Mq, Object Store
 ## Security
 
 - Encrypted configuration values resolved at runtime
+- CloudHub load balancer terminates TLS for inbound traffic
 
 
 

@@ -6,25 +6,36 @@
       xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties"
       xmlns:api-gateway="http://www.mulesoft.org/schema/mule/api-gateway"
       xmlns:http="http://www.mulesoft.org/schema/mule/http"
-      xmlns:anypoint-mq="http://www.mulesoft.org/schema/mule/anypoint-mq"
+      xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
       xmlns:os="http://www.mulesoft.org/schema/mule/os"
-      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/schema/mule/secure-properties/current/mule-secure-properties.xsd http://www.mulesoft.org/schema/mule/api-gateway http://www.mulesoft.org/schema/mule/api-gateway/current/mule-api-gateway.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/anypoint-mq http://www.mulesoft.org/schema/mule/anypoint-mq/current/mule-anypoint-mq.xsd http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd">
+      xmlns:sqs="http://www.mulesoft.org/schema/mule/sqs"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/schema/mule/secure-properties/current/mule-secure-properties.xsd http://www.mulesoft.org/schema/mule/api-gateway http://www.mulesoft.org/schema/mule/api-gateway/current/mule-api-gateway.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd http://www.mulesoft.org/schema/mule/sqs http://www.mulesoft.org/schema/mule/sqs/current/mule-sqs.xsd">
   <configuration defaultErrorHandler-ref="globalErrorHandler" />
   <configuration-properties doc:name="Configuration properties" file="properties/common-properties.yaml" />
-  <secure-properties:config name="Secure_Properties_Config" file="properties/secure-${mule.env}.yaml" key="${secure.key}" doc:name="Secure Properties Config" doc:id="doc-5d6fc26a" />
-  <http:request-config name="AzureKeyVaultConfig" basePath="/" doc:name="Azure Key Vault Config" doc:id="doc-7e6addcd">
-    <http:request-connection host="${http.request.host}" port="${http.request.port}" protocol="${http.request.protocol}" doc:id="doc-67f26829" connectionIdleTimeout="${http.request.timeout}" />
+  <secure-properties:config name="Secure_Properties_Config" file="properties/secure-${mule.env}.yaml" key="${secure.key}" doc:name="Secure Properties Config" doc:id="doc-127aebf7" />
+  <http:request-config name="salesforceAuthConfig" basePath="/services/oauth2" doc:name="Salesforce Auth Config" doc:id="doc-1af1292e">
+    <http:request-connection host="${http.request.host}" port="${http.request.port}" protocol="${http.request.protocol}" doc:id="doc-9df6d86c" connectionIdleTimeout="${http.request.timeout}" />
   </http:request-config>
-  <http:request-config name="SalesforceConfig" basePath="/" doc:name="Salesforce REST API Config" doc:id="doc-d44f2ce3">
-    <http:request-connection host="${http.request.host}" port="${http.request.port}" protocol="${http.request.protocol}" doc:id="doc-f3db1ed5" connectionIdleTimeout="${http.request.timeout}" />
+  <http:request-config name="salesforceApiConfig" basePath="/services/data/${salesforce.apiVersion}" doc:name="Salesforce API Config" doc:id="doc-1dbb42bd">
+    <http:request-connection host="${http.request.host}" port="${http.request.port}" protocol="${http.request.protocol}" doc:id="doc-4448db06" connectionIdleTimeout="${http.request.timeout}" />
   </http:request-config>
-  <http:listener-config name="HTTP_Listener_config" basePath="/salesforce-system-api/api" doc:id="doc-31ca00a5">
-    <http:listener-connection host="${http.host}" port="${http.port}" protocol="${http.protocol}" doc:id="doc-1b92dd85" readTimeout="${http.timeout}" />
+  <http:request-config name="awsSecretsManagerConfig" basePath="/" doc:name="AWS Secrets Manager Config" doc:id="doc-37288be8">
+    <http:request-connection host="${http.request.host}" port="${http.request.port}" protocol="${http.request.protocol}" doc:id="doc-4682dc52" connectionIdleTimeout="${http.request.timeout}" />
+  </http:request-config>
+  <http:request-config name="Splunk_log4j2_appenderConfig" doc:name="splunk-log4j2-appender placeholder config (review host before deploy)">
+    <http:request-connection protocol="HTTPS" host="${splunk-log4j2-appender.host}" port="${splunk-log4j2-appender.port}" />
+  </http:request-config>
+  <http:listener-config name="HTTP_Listener_config" basePath="/salesforce-system-api/api" doc:name="HTTP Listener Config" doc:id="doc-52dd90ca">
+    <http:listener-connection host="${http.host}" port="${https.port}" protocol="HTTPS" doc:id="doc-69e58bb6" readTimeout="${http.timeout}">
+      <tls:context name="listenerTlsContext">
+        <tls:key-store type="jks" path="${tls.keystore.path}" password="${secure::tls.keystore.password}" keyPassword="${secure::tls.keystore.keyPassword}" />
+      </tls:context>
+    </http:listener-connection>
   </http:listener-config>
-  <anypoint-mq:config name="Anypoint_MQ_Config" doc:name="Anypoint MQ Config" doc:id="doc-64c7aa9e">
-    <anypoint-mq:connection url="${mq.url}" clientId="${secure::mq.clientId}" clientSecret="${secure::mq.clientSecret}" doc:id="doc-5fd4129d" />
-  </anypoint-mq:config>
-  <api-gateway:autodiscovery apiId="${api.id}" ignoreBasePath="true" doc:name="API Autodiscovery" doc:id="autodiscovery-e555393c" flowRef="salesforce-system-api-sapi-api-main" />
-  <os:object-store name="SalesforceOAuthTokenStore" entryTtl="55" entryTtlUnit="MINUTES" maxEntries="10" persistent="false" doc:name="Salesforce OAuth Token Store" doc:id="doc-36efbdb0" />
+  <api-gateway:autodiscovery apiId="${api.id}" ignoreBasePath="true" doc:name="API Autodiscovery" doc:id="autodiscovery-9eda4266" flowRef="salesforce-system-api-sapi-api-main" />
+  <os:object-store name="salesforceOAuthTokenStore" entryTtl="55" entryTtlUnit="MINUTES" maxEntries="10" persistent="false" doc:name="Salesforce OAuth Token Store" doc:id="doc-20f97aab" />
+  <sqs:config name="AmazonSQS_Config" doc:name="Amazon SQS Config">
+    <sqs:basic-connection accessKey="${aws.sqs.accessKey}" secretKey="${secure::aws.sqs.secretKey}" region="${aws.sqs.region}" />
+  </sqs:config>
 
 </mule>

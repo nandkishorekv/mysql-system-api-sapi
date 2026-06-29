@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+      xmlns:validation="http://www.mulesoft.org/schema/mule/validation"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/validation http://www.mulesoft.org/schema/mule/validation/current/mule-validation.xsd">
+
+  <sub-flow name="validate-upload-batch-request-sub-flow" doc:id="doc-0252b5be">
+    <flow-ref name="process-info-logger-sub-flow" doc:name="Call process-info-logger-sub-flow (Logger)" doc:id="doc-8fm96zc9" />
+    <validation:is-true expression="#[payload.files != null and !isEmpty(payload.files)]" message="files array is required and must not be empty" doc:id="doc-2a8c42a2" />
+    <validation:is-true expression="#[sizeOf(payload.files) &lt;= 5]" message="files array must contain at most 5 files" doc:id="doc-1443dce8" />
+    <flow-ref name="process-info-logger-sub-flow" doc:name="Call process-info-logger-sub-flow (Logger)" doc:id="doc-pufbv4uq" />
+  </sub-flow>
+
+</mule>

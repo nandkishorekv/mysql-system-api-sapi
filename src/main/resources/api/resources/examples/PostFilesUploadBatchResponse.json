@@ -1,0 +1,8 @@
+{
+  "numberOfFilesSent": "sample_numberOfFilesSent",
+  "numberOfFilesSuccessfullyUploaded": "sample_numberOfFilesSuccessfullyUploaded",
+  "numberOfFilesUpserted": "sample_numberOfFilesUpserted",
+  "numberOfFilesUploadedToKnowledge": "sample_numberOfFilesUploadedToKnowledge",
+  "filesUploadedAndUpserted": "sample_filesUploadedAndUpserted",
+  "errors": "sample_errors"
+}

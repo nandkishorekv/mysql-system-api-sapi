@@ -1,5 +1,10 @@
-mq:
+tls:
+  keystore:
+    password: "CHANGEME"
+    keyPassword: "CHANGEME"
+salesforce:
   clientId: "your-client-id"
-  clientSecret: "your-client-secret"
-azureKeyVault:
-  accessToken: "CHANGEME"
+  clientSecret: "CHANGEME"
+aws:
+  sqs:
+    secretKey: "CHANGEME"

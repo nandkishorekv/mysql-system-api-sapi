@@ -1,8 +1,23 @@
 {
-  "status": "active",
-  "apiName": "Sample Name",
-  "version": "sample_version",
-  "timestamp": "2026-06-20T10:44:42.664Z",
-  "uptime": 10,
-  "salesforceConnectivityStatus": "active"
+  "statusCode": "200",
+  "overallStatus": "Success",
+  "api": {
+    "apiName": "salesforce-system-api-sapi",
+    "apiLayer": "System",
+    "statusCode": "200",
+    "description": "Success",
+    "apiEnvironment": "PROD",
+    "timeStamp": "2026-06-19T07:19:54.785Z",
+    "apiInvoked": [
+      {
+        "apiName": "downstream-external-api",
+        "apiLayer": "External System",
+        "statusCode": "200",
+        "description": "Success",
+        "apiEnvironment": "PROD",
+        "timeStamp": "2026-06-19T07:19:54.785Z",
+        "apiInvoked": null
+      }
+    ]
+  }
 }

@@ -7,10 +7,10 @@ servers:
   - url: 'https://salesforce-system-api-sapi.cloudhub.io/api/v1'
     description: CloudHub 2.0 deployment
 paths:
-  /salesforce-system-api/files/upload:
+  /files/upload-batch:
     post:
-      summary: POST /salesforce-system-api/files/upload
-      operationId: post_salesforce_system_api_files_upload
+      summary: POST /files/upload-batch
+      operationId: post_files_upload_batch
       tags:
         - salesforce-system-api-sapi
       requestBody:
@@ -92,39 +92,4 @@ paths:
                   message:
                     type: string
 components:
-  schemas:
-    Salesforce System APIRequest:
-      type: object
-      properties:
-        correlationId:
-          type: string
-        batchId:
-          type: string
-        files:
-          type: array
-      required:
-        - correlationId
-        - batchId
-        - files
-    Salesforce System APIResponse:
-      type: object
-      properties:
-        status:
-          type: string
-        apiName:
-          type: string
-        version:
-          type: string
-        timestamp:
-          type: string
-        uptime:
-          type: number
-        salesforceConnectivityStatus:
-          type: string
-      required:
-        - status
-        - apiName
-        - version
-        - timestamp
-        - uptime
-        - salesforceConnectivityStatus
+  schemas: {}

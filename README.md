@@ -17,23 +17,20 @@ will start successfully. Search for `CHANGEME` across the project to find them a
 |---|---|---|
 | `http.host` | `CHANGEME` | Hostname or IP of the server |
 | `http.port` | `CHANGEME` | Port number |
-| `http.protocol` | `CHANGEME` | Update this value for your environment |
 | `http.timeout` | `CHANGEME` | Timeout in milliseconds |
+| `tls.keystore.path` | `CHANGEME` | Update this value for your environment |
 | `http.request.host` | `CHANGEME` | Hostname or IP of the server |
 | `http.request.port` | `CHANGEME` | Port number |
 | `http.request.protocol` | `CHANGEME` | Update this value for your environment |
 | `http.request.timeout` | `CHANGEME` | Timeout in milliseconds |
-| `mq.url` | `CHANGEME` | Full connection URL |
+| `salesforce.apiVersion` | `CHANGEME` | API version string (e.g. v1) |
 | `mule.env` | `CHANGEME` | Update this value for your environment |
 | `secure.key` | `CHANGEME` | Update this value for your environment |
-| `api.retry.maxRetries` | `CHANGEME` | Number of retry attempts |
-| `api.retry.delayMs` | `CHANGEME` | Number of retry attempts |
-| `salesforce.host` | `CHANGEME` | Hostname or IP of the server |
-| `salesforce.apiVersion` | `CHANGEME` | API version string (e.g. v1) |
-| `salesforce.linkedEntityId` | `CHANGEME` | Update this value for your environment |
+| `splunk-log4j2-appender.host` | `CHANGEME` | Hostname or IP of the server |
+| `splunk-log4j2-appender.port` | `CHANGEME` | Port number |
+| `aws.sqs.dlq.url` | `CHANGEME` | Full connection URL |
+| `salesforce.knowledgeArticleId` | `CHANGEME` | Update this value for your environment |
 | `salesforce.contentWorkspaceId` | `CHANGEME` | Update this value for your environment |
-| `dlq.queue.destination` | `CHANGEME` | Message queue / topic name |
-| `queue.salesforce-system-api.dlq.destination` | `CHANGEME` | Message queue / topic name |
 | `api.id` | `CHANGEME` | Anypoint Platform API Manager API ID — replace "23453" with your real ID |
 | `api.majorVersion` | `CHANGEME` | API version string (e.g. v1) |
 | `priority.debug` | `CHANGEME` | Update this value for your environment |
@@ -58,9 +55,10 @@ will start successfully. Search for `CHANGEME` across the project to find them a
 
 | Property Key | Default | Description |
 |---|---|---|
-| `mq.clientId` | `CHANGEME` | Sensitive value — encrypt before committing |
-| `mq.clientSecret` | `CHANGEME` | Client secret — encrypt before committing |
-| `azureKeyVault.accessToken` | `CHANGEME` | API / OAuth token — encrypt before committing |
+| `tls.keystore.password` | `CHANGEME` | Password — encrypt before committing |
+| `tls.keystore.keyPassword` | `CHANGEME` | Password — encrypt before committing |
+| `salesforce.clientId` | `CHANGEME` | Sensitive value — encrypt before committing |
+| `salesforce.clientSecret` | `CHANGEME` | Client secret — encrypt before committing |
 
 > **How to encrypt:** Use the [Anypoint Secure Properties Tool](https://docs.mulesoft.com/mule-runtime/latest/secure-configuration-properties)
 > to encrypt each value before setting it in the YAML files.
@@ -146,7 +144,7 @@ anypoint-cli runtime-mgr application deploy \
 #### Exposed Endpoints (from RAML)
 | Endpoint |
 |---|
-| `POST /salesforce-system-api/files/upload` |
+| `POST /files/upload-batch` |
 | `GET /health` |
 
 

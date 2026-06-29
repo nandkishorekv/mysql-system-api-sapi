@@ -74,7 +74,7 @@ output application/json
 ---
 { 
     "priority": vars.priority as String, 
-    "correlationId": (vars.apiDetails.correlationId default vars.correlationId) as String as String, 
+    "correlationId": (vars.apiDetails.correlationId default vars.correlationId) as String,
     "timestamp": now(),
     "env": p('mule.env') as String,
     "api": p('api.name'),  
